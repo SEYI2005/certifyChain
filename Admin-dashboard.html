@@ -14,7 +14,6 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-    <!-- QRCode.js — generates QR codes in the browser with no external API needed -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -710,7 +709,6 @@
   <body>
     <div id="notificationArea"></div>
 
-    <!-- ── Header ── -->
     <header>
       <div class="header-left">
         <div class="logo-icon">⛓</div>
@@ -753,7 +751,6 @@
     </header>
 
     <main>
-      <!-- ── Profile Card ── -->
       <div class="profile-card">
         <div class="profile-avatar">🏫</div>
         <div>
@@ -788,7 +785,6 @@
         </div>
       </div>
 
-      <!-- ── SECTION 1: Issue Certificate ── -->
       <section>
         <div class="section-head">
           <div class="section-title">
@@ -816,7 +812,6 @@
               onchange="onFileSelected()"
             />
 
-            <!-- Duplicate document warning — shown when same file uploaded twice -->
             <div
               id="duplicateDocWarning"
               style="display: none; margin-bottom: 12px"
@@ -905,7 +900,6 @@
           </div>
         </div>
 
-        <!-- ── Document Preview Panel ── -->
         <div class="doc-preview-panel" id="docPreviewPanel">
           <div class="doc-preview-header">
             📋 Manual Verification — Compare document with entered details
@@ -955,7 +949,6 @@
             </div>
           </div>
 
-          <!-- Confirmation checklist -->
           <div class="confirmation-area">
             <div class="confirm-instruction">
               <strong
@@ -1026,18 +1019,15 @@
           </div>
         </div>
 
-        <!-- ── QR Code + Certificate Success Section ── -->
         <div class="qr-success-section" id="qrSuccessSection">
           <div class="qr-success-header">
             ✅ Certificate Issued to Blockchain — QR Code Generated
           </div>
 
           <div class="qr-success-body">
-            <!-- LEFT: QR Code -->
             <div class="qr-code-area">
               <div class="qr-label">Scan to Verify</div>
 
-              <!-- QRCode.js renders the QR code canvas here -->
               <div id="qrcode-container"></div>
 
               <div class="qr-scan-hint">
@@ -1045,7 +1035,6 @@
               </div>
             </div>
 
-            <!-- RIGHT: Certificate details + actions -->
             <div class="cert-details-area">
               <div>
                 <div class="cert-id-label">Certificate ID</div>
@@ -1099,7 +1088,6 @@
         </div>
       </section>
 
-      <!-- ── SECTION 2: Revoke ── -->
       <section>
         <div class="section-head">
           <div class="section-title">
@@ -1143,7 +1131,6 @@
         <div id="revokeMsg" class="mt-2 fw-semibold"></div>
       </section>
 
-      <!-- ── SECTION 3: Ledger ── -->
       <section>
         <div class="section-head">
           <div class="section-title">
@@ -1607,9 +1594,8 @@
       let web3, contract, currentAccount;
 
       // The verification base URL — what gets embedded in the QR code
-      // Change this to your deployed URL if hosting publicly
       const BASE_VERIFY_URL =
-        "https://eth-sepolia.g.alchemy.com/v2/kpCCErcVYQBBT7cM_66E8";
+        "https://certify-chain-zooz-lu8716i9m-seyis-projects-09f5a70b.vercel.app/verify.html";
 
       // ============================================================
       //  INIT
@@ -1712,11 +1698,7 @@
         resetConfirmation();
 
         // ── Duplicate document check ──
-        // Hash the file immediately on selection and ask the blockchain
-        // if this document has already been issued before.
-        // This fires BEFORE the admin fills any other fields or clicks anything,
-        // so they get a clear warning immediately.
-        if (!contract) return; // contract not ready yet (page still loading)
+        if (!contract) return;
 
         try {
           const buffer = await file.arrayBuffer();
@@ -1725,7 +1707,6 @@
             .map((b) => b.toString(16).padStart(2, "0"))
             .join("");
 
-          // Store hash on the file object so issueCert() can reuse it
           file._sha256 = certHash;
 
           const alreadyIssued = await contract.methods
@@ -1733,22 +1714,17 @@
             .call();
 
           if (alreadyIssued) {
-            // Show a prominent warning — disable the preview button so
-            // admin must acknowledge before proceeding
             const warning = document.getElementById("duplicateDocWarning");
             warning.style.display = "block";
             document.getElementById("previewBtn").disabled = true;
             document.getElementById("previewBtn").style.opacity = "0.5";
           } else {
-            // Document is new — clear any previous warning
             document.getElementById("duplicateDocWarning").style.display =
               "none";
             document.getElementById("previewBtn").disabled = false;
             document.getElementById("previewBtn").style.opacity = "1";
           }
         } catch (err) {
-          // If the check fails (e.g. node not running), just continue silently
-          // The contract will still reject it on-chain if it's a duplicate
           console.warn("Duplicate check failed:", err.message);
         }
       }
@@ -1809,7 +1785,7 @@
       }
 
       // ============================================================
-      //  ISSUE CERTIFICATE — generates QR automatically on success
+      //  ISSUE CERTIFICATE
       // ============================================================
       async function issueCert() {
         const file = document.getElementById("certFile").files[0];
@@ -1826,17 +1802,14 @@
         btn.innerHTML = `<span class="spinner-white"></span> Sending to blockchain...`;
 
         try {
-          // 1. Hash the certificate file
           const buffer = await file.arrayBuffer();
           const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
           const certHash = Array.from(new Uint8Array(hashBuffer))
             .map((b) => b.toString(16).padStart(2, "0"))
             .join("");
 
-          // 2. Generate a unique Certificate ID
           const certId = generateCertID(progName, year);
 
-          // 3. Send to Ethereum blockchain via MetaMask
           await contract.methods
             .issueCertificate(
               certId,
@@ -1848,13 +1821,8 @@
             )
             .send({ from: currentAccount });
 
-          // 4. Blockchain confirmed — now generate QR code automatically
           generateAndShowQR(certId, name, fullProg, year);
-
-          // 5. Hide the preview panel
           document.getElementById("docPreviewPanel").style.display = "none";
-
-          // 6. Refresh the ledger
           await loadLedger();
         } catch (err) {
           console.error(err);
@@ -1869,69 +1837,45 @@
       }
 
       // ============================================================
-      //  Generate QR Code and show success section
-      //
-      //  QRCode.js is used here — it's already loaded from the CDN
-      //  at the top of the page. It works entirely in the browser
-      //  with no external API call needed.
-      //
-      //  The QR code encodes a URL in this format:
-      //  http://localhost:3000/verify.html?id=BOWEN-CS-2026-1234
-      //
-      //  When scanned, the browser opens verify.html which reads
-      //  the ?id= parameter and auto-verifies against the blockchain.
+      //  Generate QR Code
       // ============================================================
       function generateAndShowQR(certId, name, programme, year) {
-        // Build the verification URL that gets embedded in the QR code
         const verifyURL = `${BASE_VERIFY_URL}?id=${certId}`;
 
-        // Clear any previous QR code
         const container = document.getElementById("qrcode-container");
         container.innerHTML = "";
 
-        // Generate QR code using QRCode.js
-        // The library draws a canvas element inside the container div
         new QRCode(container, {
-          text: verifyURL, // The URL encoded in the QR
-          width: 180, // Size in pixels
+          text: verifyURL,
+          width: 180,
           height: 180,
-          colorDark: "#003d82", // Bowen blue dots
-          colorLight: "#ffffff", // White background
-          correctLevel: QRCode.CorrectLevel.H, // Highest error correction
+          colorDark: "#003d82",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H,
         });
 
-        // Fill in the certificate details on the right side
         document.getElementById("displayCertId").innerText = certId;
         document.getElementById("issued-name").innerText = name;
         document.getElementById("issued-prog").innerText = programme;
         document.getElementById("issued-year").innerText = year;
         document.getElementById("verifyUrlDisplay").innerText = verifyURL;
 
-        // Show the success section with smooth animation
         const section = document.getElementById("qrSuccessSection");
         section.style.display = "block";
         section.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
-      // ============================================================
-      //  Download QR code as PNG image
-      //  QRCode.js renders to a <canvas> element — we export it
-      // ============================================================
       function downloadQR() {
-        // QRCode.js renders either a canvas or an img depending on browser
         const canvas = document.querySelector("#qrcode-container canvas");
         const img = document.querySelector("#qrcode-container img");
-
         const certId = document.getElementById("displayCertId").innerText;
 
         if (canvas) {
-          // Canvas — convert to PNG data URL and trigger download
           const a = document.createElement("a");
           a.download = `${certId}-QR.png`;
           a.href = canvas.toDataURL("image/png");
           a.click();
         } else if (img) {
-          // Fallback if QRCode.js used an img element
           const a = document.createElement("a");
           a.download = `${certId}-QR.png`;
           a.href = img.src;
@@ -1941,9 +1885,6 @@
         }
       }
 
-      // ============================================================
-      //  Copy Certificate ID to clipboard
-      // ============================================================
       function copyCertId() {
         const certId = document.getElementById("displayCertId").innerText;
         navigator.clipboard.writeText(certId).then(() => {
@@ -1956,9 +1897,6 @@
         });
       }
 
-      // ============================================================
-      //  Generate Certificate ID
-      // ============================================================
       function generateCertID(progName, year) {
         const map = {
           "COMPUTER SCIENCE": "CS",
