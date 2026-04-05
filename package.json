@@ -1,0 +1,23 @@
+{
+  "name": "certifychain",
+  "version": "1.0.0",
+  "description": "Bowen University Blockchain Certificate Verification System",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node",
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "performance": "npx hardhat run scripts/performance.js --network localhost",
+    "serve": "npx http-server . -p 3000",
+    "clean": "npx hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.1",
+    "ethers": "^6.11.0"
+  }
+}

@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertifyChain — Admin Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --navy: #0a0f1e;
+        --navy-card: #111827;
+        --navy-deep: #0d1630;
+        --gold: #c9a84c;
+        --gold-light: #e8c96d;
+        --gold-dim: rgba(201, 168, 76, 0.1);
+        --white: #f5f7fa;
+        --muted: #8892a4;
+        --border: rgba(255, 255, 255, 0.07);
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        font-family: "Sora", sans-serif;
+        background-color: var(--navy);
+        color: var(--white);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+            ellipse 60% 50% at 10% 60%,
+            rgba(201, 168, 76, 0.05) 0%,
+            transparent 70%
+          ),
+          repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 40px,
+            rgba(255, 255, 255, 0.012) 40px,
+            rgba(255, 255, 255, 0.012) 41px
+          ),
+          repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 40px,
+            rgba(255, 255, 255, 0.012) 40px,
+            rgba(255, 255, 255, 0.012) 41px
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+      }
+
+      /* ── Logo ── */
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 32px;
+        opacity: 0;
+        animation: fadeUp 0.5s ease 0.1s forwards;
+      }
+      .logo-icon {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+      .logo-text {
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .logo-text span {
+        color: var(--gold);
+      }
+
+      /* ── Card ── */
+      .signup-card {
+        background: var(--navy-card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 38px 40px;
+        width: 100%;
+        max-width: 540px;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        animation: fadeUp 0.6s ease 0.2s forwards;
+      }
+      .signup-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold),
+          transparent
+        );
+      }
+
+      .card-eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        color: var(--gold);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .card-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 6px;
+      }
+      .card-sub {
+        font-size: 0.83rem;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 30px;
+        font-weight: 300;
+      }
+
+      /* ── Step labels ── */
+      .step-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--gold);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        margin-top: 24px;
+      }
+      .step-num {
+        width: 22px;
+        height: 22px;
+        background: var(--gold-dim);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: var(--gold);
+      }
+
+      /* ── Form fields ── */
+      .field {
+        margin-bottom: 14px;
+      }
+      .field label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--muted);
+        margin-bottom: 6px;
+        letter-spacing: 0.03em;
+      }
+      .field input,
+      .field select {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-family: "Sora", sans-serif;
+        font-size: 0.88rem;
+        color: var(--white);
+        outline: none;
+        transition: border-color 0.2s ease;
+        appearance: none;
+      }
+      .field input::placeholder {
+        color: var(--muted);
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--gold);
+        background: rgba(201, 168, 76, 0.04);
+      }
+      .field select option {
+        background: var(--navy-deep);
+        color: var(--white);
+      }
+
+      /* NUC code validation badge */
+      .nuc-wrap {
+        position: relative;
+      }
+      .nuc-badge {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 20px;
+        display: none;
+      }
+      .nuc-badge.valid {
+        background: rgba(34, 197, 94, 0.15);
+        color: var(--success);
+        display: block;
+      }
+      .nuc-badge.invalid {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+        display: block;
+      }
+
+      /* File upload */
+      .file-zone {
+        border: 2px dashed var(--border);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+      }
+      .file-zone:hover {
+        border-color: var(--gold);
+        background: var(--gold-dim);
+      }
+      .file-zone.has-file {
+        border-color: var(--success);
+        background: rgba(34, 197, 94, 0.06);
+      }
+      .file-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+      }
+      .file-zone .file-icon {
+        font-size: 1.6rem;
+        margin-bottom: 8px;
+      }
+      .file-zone .file-label {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .file-zone .file-name {
+        font-size: 0.82rem;
+        color: var(--success);
+        margin-top: 6px;
+        display: none;
+      }
+      .file-hash {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin-top: 8px;
+        word-break: break-all;
+        display: none;
+      }
+
+      /* ── Wallet area ── */
+      .wallet-area {
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+      .wallet-area.connected {
+        border-color: rgba(34, 197, 94, 0.4);
+        background: rgba(34, 197, 94, 0.06);
+        border-style: solid;
+      }
+      .wallet-address {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.78rem;
+        color: var(--success);
+        word-break: break-all;
+        margin-top: 8px;
+        display: none;
+      }
+
+      /* ── Buttons ── */
+      .btn {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: none;
+        font-family: "Sora", sans-serif;
+        font-size: 0.92rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .btn-outline:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+      .btn-gold {
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        color: var(--navy);
+        margin-top: 20px;
+      }
+      .btn-gold:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
+      }
+      .btn-gold:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* ── Message ── */
+      #message {
+        margin-top: 16px;
+        font-size: 0.82rem;
+        min-height: 20px;
+      }
+      .alert {
+        padding: 12px 14px;
+        border-radius: 10px;
+        line-height: 1.5;
+      }
+      .alert-success {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        color: var(--success);
+      }
+      .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--danger);
+      }
+      .alert-warning {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: var(--warning);
+      }
+      .alert-info {
+        background: rgba(201, 168, 76, 0.1);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        color: var(--gold);
+      }
+
+      /* ── Login link ── */
+      .login-row {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        opacity: 0;
+        animation: fadeUp 0.5s ease 0.4s forwards;
+      }
+      .login-row a {
+        color: var(--gold);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .login-row a:hover {
+        text-decoration: underline;
+      }
+
+      /* Spinner */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        width: 15px;
+        height: 15px;
+        border: 2px solid var(--navy);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 540px) {
+        .signup-card {
+          padding: 26px 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- Logo -->
+      <div class="logo-row">
+        <div class="logo-icon">⛓</div>
+        <div class="logo-text">Certify<span>Chain</span></div>
+      </div>
+
+      <!-- Signup Card -->
+      <div class="signup-card">
+        <div class="card-eyebrow">Institution Admin</div>
+        <h1 class="card-title">Create Admin Account</h1>
+        <p class="card-sub">
+          Your details will be stored permanently on the Ethereum blockchain. No
+          database. No server. Tamper-proof and publicly auditable.
+        </p>
+
+        <!-- STEP 1: Institution Details -->
+        <div class="step-label">
+          <span class="step-num">1</span> Institution Details
+        </div>
+
+        <div class="field">
+          <label>School Name</label>
+          <input
+            type="text"
+            id="schoolName"
+            placeholder="e.g. Bowen University"
+          />
+        </div>
+
+        <div class="field">
+          <label>NUC Accreditation Code</label>
+          <div class="nuc-wrap">
+            <input
+              type="text"
+              id="nucCode"
+              placeholder="e.g. NUC-BU-095"
+              autocomplete="off"
+              oninput="validateNucCode()"
+            />
+            <span class="nuc-badge" id="nucBadge"></span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--muted); margin-top: 5px">
+            Bowen University code:
+            <strong style="color: var(--gold)">NUC-BU-095</strong>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Upload NUC Verification Document</label>
+          <div
+            class="file-zone"
+            id="fileZone"
+            onclick="document.getElementById('nucFile').click()"
+          >
+            <div class="file-icon">📄</div>
+            <div class="file-label">
+              Click to upload PDF, JPG, or PNG (Max 5MB)
+            </div>
+            <div class="file-name" id="fileName"></div>
+            <input
+              type="file"
+              id="nucFile"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onchange="handleFileUpload(this)"
+              style="display: none"
+            />
+          </div>
+          <div class="file-hash" id="fileHash"></div>
+        </div>
+
+        <!-- STEP 2: Admin Details -->
+        <div class="step-label">
+          <span class="step-num">2</span> Admin Details
+        </div>
+
+        <div class="field">
+          <label>Full Name</label>
+          <input
+            type="text"
+            id="adminName"
+            placeholder="Enter your full name"
+          />
+        </div>
+
+        <div class="field">
+          <label>Email Address</label>
+          <input
+            type="email"
+            id="adminEmail"
+            placeholder="admin@university.edu.ng"
+          />
+        </div>
+
+        <!-- STEP 3: Invite Code -->
+        <div class="step-label">
+          <span class="step-num">3</span> Admin Verification Number
+        </div>
+        <p
+          style="
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 12px;
+            line-height: 1.6;
+          "
+        >
+          Obtain this code from an existing CertifyChain admin. It rotates each
+          time a new admin registers.
+        </p>
+
+        <div class="field">
+          <input
+            type="text"
+            id="inviteCode"
+            placeholder="e.g. NUC-AUTH-1"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- STEP 4: Connect Wallet -->
+        <div class="step-label">
+          <span class="step-num">4</span> Connect MetaMask Wallet
+        </div>
+        <p
+          style="
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 12px;
+            line-height: 1.6;
+          "
+        >
+          Your wallet address will be permanently whitelisted as admin on the
+          blockchain.
+        </p>
+
+        <div class="wallet-area" id="walletArea">
+          <button
+            class="btn btn-outline"
+            id="connectWalletBtn"
+            onclick="connectWallet()"
+          >
+            🦊 Connect MetaMask
+          </button>
+          <div class="wallet-address" id="walletAddress"></div>
+        </div>
+
+        <!-- Submit -->
+        <button
+          class="btn btn-gold"
+          id="submitBtn"
+          disabled
+          onclick="submitRegistration()"
+        >
+          <span id="submitBtnContent">⛓ Register on Blockchain</span>
+        </button>
+
+        <div id="message"></div>
+      </div>
+
+      <div class="login-row">
+        Already registered? <a href="Admin-login.html">Login →</a>
+      </div>
+    </div>
+
+    <script>
+      // ============================================================
+      //  CONTRACT CONFIG — update address after redeployment
+      // ============================================================
+      const CONTRACT_ADDRESS = "0xD01DeE3c241DdbfE94C62CBeCf8fFB2060764383";
+      const CONTRACT_ABI = [
+        {
+          inputs: [],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newAdmin",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "newAdminCode",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "schoolName",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "AdminAdded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "removedAdmin",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "AdminRemoved",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "certificateID",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "studentName",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "CertificateIssued",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "certificateID",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "CertificateRevoked",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "nucCode",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "NucCodeAdded",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_nucCode",
+              type: "string",
+            },
+          ],
+          name: "addValidNucCode",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "adminCount",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "adminProfiles",
+          outputs: [
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "email",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "schoolName",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "nucCode",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "nucDocHash",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "joinCode",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "registeredAt",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "exists",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "admins",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "allCertificateIDs",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          name: "certificates",
+          outputs: [
+            {
+              internalType: "string",
+              name: "certificateID",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "studentName",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "certificateType",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "school",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "graduationDate",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "certificateHash",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "isValid",
+              type: "bool",
+            },
+            {
+              internalType: "bool",
+              name: "isIssued",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "currentAdminCode",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_admin",
+              type: "address",
+            },
+          ],
+          name: "getAdminProfile",
+          outputs: [
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "email",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "schoolName",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "nucCode",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "nucDocHash",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "joinCode",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "registeredAt",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getAllIssuedCertificates",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "certificateID",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "studentName",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "certificateType",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "school",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "graduationDate",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "certificateHash",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "timestamp",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "isValid",
+                  type: "bool",
+                },
+                {
+                  internalType: "bool",
+                  name: "isIssued",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct CertifyChain.Certificate[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCurrentCode",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+          ],
+          name: "isAdmin",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_nucCode",
+              type: "string",
+            },
+          ],
+          name: "isValidNucCode",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_certificateID",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_studentName",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_certificateType",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_school",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_graduationDate",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_certificateHash",
+              type: "string",
+            },
+          ],
+          name: "issueCertificate",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_inviteCode",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_email",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_schoolName",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_nucCode",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_nucDocHash",
+              type: "string",
+            },
+          ],
+          name: "registerAdmin",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_admin",
+              type: "address",
+            },
+          ],
+          name: "removeAdmin",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_nucCode",
+              type: "string",
+            },
+          ],
+          name: "removeValidNucCode",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_certificateID",
+              type: "string",
+            },
+          ],
+          name: "revokeCertificate",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          name: "validNucCodes",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_certificateID",
+              type: "string",
+            },
+          ],
+          name: "verifyCertificate",
+          outputs: [
+            {
+              internalType: "string",
+              name: "studentName",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "certificateType",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "school",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "graduationDate",
+              type: "string",
+            },
+            {
+              internalType: "bool",
+              name: "isValid",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      // ============================================================
+      //  STATE
+      // ============================================================
+      let web3;
+      let contract;
+      let connectedWallet = null;
+      let nucDocHash = "";
+      let nucCodeValid = false;
+
+      // ============================================================
+      //  STEP 1 — Validate NUC code against blockchain
+      // ============================================================
+      let nucValidationTimer;
+      async function validateNucCode() {
+        const code = document.getElementById("nucCode").value.trim();
+        const badge = document.getElementById("nucBadge");
+
+        badge.className = "nuc-badge";
+        badge.innerText = "";
+
+        if (!code || !contract) return;
+
+        // Debounce — wait 600ms after user stops typing
+        clearTimeout(nucValidationTimer);
+        nucValidationTimer = setTimeout(async () => {
+          try {
+            const valid = await contract.methods.isValidNucCode(code).call();
+            if (valid) {
+              badge.className = "nuc-badge valid";
+              badge.innerText = "✓ Accredited";
+              nucCodeValid = true;
+            } else {
+              badge.className = "nuc-badge invalid";
+              badge.innerText = "✗ Not recognised";
+              nucCodeValid = false;
+            }
+          } catch (_) {
+            nucCodeValid = false;
+          }
+        }, 600);
+      }
+
+      // ============================================================
+      //  STEP 1 — Hash NUC document file client-side (SHA-256)
+      // ============================================================
+      async function handleFileUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+          showMsg("❌ File too large. Maximum 5MB allowed.", "danger");
+          input.value = "";
+          return;
+        }
+
+        const zone = document.getElementById("fileZone");
+        const nameEl = document.getElementById("fileName");
+        const hashEl = document.getElementById("fileHash");
+
+        nameEl.innerText = `📎 ${file.name}`;
+        nameEl.style.display = "block";
+        hashEl.innerText = "⏳ Hashing document...";
+        hashEl.style.display = "block";
+        zone.classList.add("has-file");
+
+        try {
+          const buffer = await file.arrayBuffer();
+          const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          nucDocHash = hashArray
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+
+          hashEl.innerText = `🔒 SHA-256: ${nucDocHash}`;
+        } catch (err) {
+          showMsg("❌ Failed to hash document. Please try again.", "danger");
+          nucDocHash = "";
+        }
+      }
+
+      // ============================================================
+      //  STEP 4 — Connect MetaMask
+      // ============================================================
+      async function connectWallet() {
+        if (typeof window.ethereum === "undefined") {
+          showMsg(
+            "❌ MetaMask not detected. <a href='https://metamask.io/download/' target='_blank' style='color:var(--gold)'>Install it →</a>",
+            "danger",
+          );
+          return;
+        }
+
+        try {
+          const accounts = await ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          connectedWallet = accounts[0];
+
+          web3 = new Web3(window.ethereum);
+          contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+
+          // Check not already admin
+          const alreadyAdmin = await contract.methods
+            .isAdmin(connectedWallet)
+            .call();
+          if (alreadyAdmin) {
+            showMsg(
+              "⚠️ This wallet is already a registered admin. <a href='Admin-login.html' style='color:var(--gold)'>Login instead →</a>",
+              "warning",
+            );
+            return;
+          }
+
+          // Update wallet UI
+          const area = document.getElementById("walletArea");
+          const addrEl = document.getElementById("walletAddress");
+          const btn = document.getElementById("connectWalletBtn");
+          area.classList.add("connected");
+          addrEl.style.display = "block";
+          addrEl.innerText = connectedWallet;
+          btn.innerHTML = "✅ Wallet Connected";
+          btn.disabled = true;
+
+          document.getElementById("submitBtn").disabled = false;
+          showMsg(
+            "✅ Wallet connected. Fill in all fields and click Register.",
+            "info",
+          );
+        } catch (err) {
+          if (err.code === 4001) {
+            showMsg(
+              "❌ MetaMask request rejected. Please approve the connection.",
+              "danger",
+            );
+          } else {
+            showMsg("❌ Wallet connection failed. Please try again.", "danger");
+          }
+        }
+      }
+
+      // ============================================================
+      //  SUBMIT — validate all fields, then call registerAdmin()
+      // ============================================================
+      async function submitRegistration() {
+        const schoolName = document.getElementById("schoolName").value.trim();
+        const nucCode = document.getElementById("nucCode").value.trim();
+        const adminName = document.getElementById("adminName").value.trim();
+        const adminEmail = document.getElementById("adminEmail").value.trim();
+        const inviteCode = document.getElementById("inviteCode").value.trim();
+
+        // ── Client-side validation ──
+        if (!schoolName)
+          return showMsg("❌ Please enter the school name.", "danger");
+        if (!nucCode)
+          return showMsg(
+            "❌ Please enter the NUC accreditation code.",
+            "danger",
+          );
+        if (!nucCodeValid)
+          return showMsg(
+            "❌ The NUC code you entered is not recognised. Check it and try again.",
+            "danger",
+          );
+        if (!nucDocHash)
+          return showMsg(
+            "❌ Please upload your NUC verification document.",
+            "danger",
+          );
+        if (!adminName)
+          return showMsg("❌ Please enter your full name.", "danger");
+        if (!adminEmail)
+          return showMsg("❌ Please enter your email address.", "danger");
+        if (!inviteCode)
+          return showMsg(
+            "❌ Please enter your Admin Verification Number.",
+            "danger",
+          );
+        if (!connectedWallet)
+          return showMsg(
+            "❌ Please connect your MetaMask wallet first.",
+            "danger",
+          );
+
+        // ── Disable button, show loading ──
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        document.getElementById(
+          "submitBtnContent",
+        ).innerHTML = `<span class="spinner"></span> Sending to blockchain...`;
+        showMsg("⏳ Waiting for MetaMask confirmation...", "info");
+
+        try {
+          // ── Call the smart contract ──
+          await contract.methods
+            .registerAdmin(
+              inviteCode,
+              adminName,
+              adminEmail,
+              schoolName,
+              nucCode,
+              nucDocHash,
+            )
+            .send({ from: connectedWallet });
+
+          // ── Fetch the new rotated code ──
+          const newCode = await contract.methods
+            .getCurrentCode()
+            .call({ from: connectedWallet });
+
+          // ── Save minimal info to localStorage for dashboard display ──
+          localStorage.setItem(
+            "certifychain_admin",
+            JSON.stringify({
+              wallet: connectedWallet,
+              name: adminName,
+              school: schoolName,
+              code: newCode,
+            }),
+          );
+
+          document.getElementById("submitBtnContent").innerHTML =
+            "✅ Registered!";
+          showMsg(
+            `
+        ✅ <strong>Account created successfully!</strong><br/>
+        Your data is now permanently stored on the Ethereum blockchain.<br/>
+        The shared admin code has rotated to <strong style="color:var(--gold)">${newCode}</strong>.<br/>
+        Share this code only with the next admin you trust. Redirecting to login...
+      `,
+            "success",
+          );
+
+          setTimeout(() => {
+            window.location.href = "Admin-login.html";
+          }, 4000);
+        } catch (err) {
+          console.error(err);
+          btn.disabled = false;
+          document.getElementById("submitBtnContent").innerHTML =
+            "⛓ Register on Blockchain";
+
+          if (err.message.includes("Invalid verification code")) {
+            showMsg(
+              "❌ The Admin Verification Number is wrong. Ask an existing admin for the current code.",
+              "danger",
+            );
+          } else if (err.message.includes("not accredited")) {
+            showMsg(
+              "❌ The NUC code is not recognised on-chain. Contact the system owner to add your institution.",
+              "danger",
+            );
+          } else if (err.message.includes("already a registered admin")) {
+            showMsg(
+              "❌ This wallet is already registered as an admin.",
+              "danger",
+            );
+          } else if (err.code === 4001) {
+            showMsg("❌ Transaction cancelled in MetaMask.", "warning");
+          } else {
+            showMsg(
+              "❌ Transaction failed. Make sure you are on the Hardhat Local network and try again.",
+              "danger",
+            );
+          }
+        }
+      }
+
+      // ============================================================
+      //  HELPER — show status message
+      // ============================================================
+      function showMsg(html, type) {
+        document.getElementById(
+          "message",
+        ).innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+      }
+
+      // ============================================================
+      //  AUTO-CONNECT if wallet already approved
+      // ============================================================
+      window.addEventListener("load", async () => {
+        if (typeof window.ethereum !== "undefined") {
+          try {
+            const accounts = await ethereum.request({ method: "eth_accounts" });
+            if (accounts.length > 0) {
+              connectedWallet = accounts[0];
+              web3 = new Web3(window.ethereum);
+              contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+
+              const area = document.getElementById("walletArea");
+              const addrEl = document.getElementById("walletAddress");
+              const btn = document.getElementById("connectWalletBtn");
+              area.classList.add("connected");
+              addrEl.style.display = "block";
+              addrEl.innerText = connectedWallet;
+              btn.innerHTML = "✅ Wallet Connected";
+              btn.disabled = true;
+              document.getElementById("submitBtn").disabled = false;
+            }
+          } catch (_) {}
+        }
+      });
+    </script>
+  </body>
+</html>

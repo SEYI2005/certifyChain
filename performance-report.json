@@ -1,0 +1,65 @@
+{
+  "system": "CertifyChain — Bowen University",
+  "network": "Hardhat Local (localhost:8545)",
+  "chainId": 31337,
+  "runAt": "2026-03-27T19:31:35.082Z",
+  "singleTxLatencyMs": 76,
+  "results": [
+    {
+      "test": "TPS",
+      "batchSize": 10,
+      "elapsedSec": 0.29,
+      "tps": 34.01,
+      "avgLatencyMs": 29.4,
+      "avgGasPerTx": 240263,
+      "totalGasUsed": "2402630"
+    },
+    {
+      "test": "TPS",
+      "batchSize": 50,
+      "elapsedSec": 1.25,
+      "tps": 39.87,
+      "avgLatencyMs": 25.1,
+      "avgGasPerTx": 240291,
+      "totalGasUsed": "12014590"
+    },
+    {
+      "test": "TPS",
+      "batchSize": 100,
+      "elapsedSec": 5.61,
+      "tps": 17.82,
+      "avgLatencyMs": 56.1,
+      "avgGasPerTx": 240307,
+      "totalGasUsed": "24030740"
+    },
+    {
+      "test": "Throughput",
+      "batchSize": 10,
+      "elapsedSec": 0.25,
+      "throughput": 39.68,
+      "totalGasUsed": "2403950"
+    },
+    {
+      "test": "Throughput",
+      "batchSize": 50,
+      "elapsedSec": 1.37,
+      "throughput": 36.47,
+      "totalGasUsed": "12021190"
+    },
+    {
+      "test": "Throughput",
+      "batchSize": 100,
+      "elapsedSec": 2.19,
+      "throughput": 45.64,
+      "totalGasUsed": "24043940"
+    },
+    {
+      "test": "VerificationSpeed",
+      "runs": 100,
+      "elapsedSec": 1.01,
+      "callsPerSec": 98.91,
+      "avgMs": 10.11,
+      "gasCost": 0
+    }
+  ]
+}

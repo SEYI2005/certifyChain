@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertifyChain — Bowen University</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <style>
+      /* ── Reset & Base ── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --navy: #0a0f1e;
+        --navy-mid: #0d1630;
+        --navy-card: #111827;
+        --gold: #c9a84c;
+        --gold-light: #e8c96d;
+        --gold-dim: rgba(201, 168, 76, 0.15);
+        --white: #f5f7fa;
+        --muted: #8892a4;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --border: rgba(255, 255, 255, 0.07);
+      }
+
+      html,
+      body {
+        height: 100%;
+        font-family: "Sora", sans-serif;
+        background-color: var(--navy);
+        color: var(--white);
+        overflow-x: hidden;
+      }
+
+      /* ── Animated chain-link background ── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+            circle at 20% 50%,
+            rgba(201, 168, 76, 0.04) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(13, 22, 48, 0.8) 0%,
+            transparent 50%
+          ),
+          repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 40px,
+            rgba(255, 255, 255, 0.012) 40px,
+            rgba(255, 255, 255, 0.012) 41px
+          ),
+          repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 40px,
+            rgba(255, 255, 255, 0.012) 40px,
+            rgba(255, 255, 255, 0.012) 41px
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── Layout ── */
+      .page {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      /* ── Header ── */
+      header {
+        padding: 24px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(8px);
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo-icon {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+      .logo-text {
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .logo-text span {
+        color: var(--gold);
+      }
+
+      .header-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        background: var(--navy-card);
+        border: 1px solid var(--border);
+        padding: 5px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.05em;
+      }
+
+      /* ── Hero ── */
+      .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 60px 24px;
+        gap: 0;
+      }
+
+      .eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        color: var(--gold);
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        opacity: 0;
+        animation: fadeUp 0.6s ease 0.1s forwards;
+      }
+
+      .hero-title {
+        font-size: clamp(2.4rem, 6vw, 4.5rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        margin-bottom: 20px;
+        opacity: 0;
+        animation: fadeUp 0.7s ease 0.25s forwards;
+      }
+      .hero-title .accent {
+        color: var(--gold);
+      }
+
+      .hero-sub {
+        font-size: 1.05rem;
+        color: var(--muted);
+        max-width: 480px;
+        line-height: 1.7;
+        font-weight: 300;
+        margin-bottom: 48px;
+        opacity: 0;
+        animation: fadeUp 0.7s ease 0.4s forwards;
+      }
+
+      /* ── Connect Card ── */
+      .connect-card {
+        background: var(--navy-card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 36px 40px;
+        width: 100%;
+        max-width: 420px;
+        opacity: 0;
+        animation: fadeUp 0.7s ease 0.55s forwards;
+        position: relative;
+        overflow: hidden;
+      }
+      .connect-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold),
+          transparent
+        );
+      }
+
+      .connect-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .connect-card p {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+
+      /* Wallet status pill */
+      #walletStatus {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.78rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin-bottom: 20px;
+        color: var(--muted);
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        word-break: break-all;
+      }
+      #walletStatus.connected {
+        border-color: rgba(34, 197, 94, 0.4);
+        background: rgba(34, 197, 94, 0.06);
+        color: var(--success);
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--muted);
+        flex-shrink: 0;
+        transition: background 0.3s;
+      }
+      #walletStatus.connected .status-dot {
+        background: var(--success);
+      }
+
+      /* Buttons */
+      .btn-connect {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        font-family: "Sora", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .btn-primary-gold {
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        color: var(--navy);
+      }
+      .btn-primary-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
+      }
+      .btn-primary-gold:active {
+        transform: translateY(0);
+      }
+      .btn-primary-gold:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Loading state */
+      #loadingMessage {
+        display: none;
+        margin-top: 16px;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.78rem;
+        color: var(--gold);
+        letter-spacing: 0.05em;
+      }
+      .dot-pulse::after {
+        content: "";
+        animation: dots 1.5s infinite;
+      }
+      @keyframes dots {
+        0% {
+          content: ".";
+        }
+        33% {
+          content: "..";
+        }
+        66% {
+          content: "...";
+        }
+        100% {
+          content: "";
+        }
+      }
+
+      /* ── Trust badges ── */
+      .trust-row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 40px;
+        opacity: 0;
+        animation: fadeUp 0.7s ease 0.7s forwards;
+      }
+      .trust-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--navy-card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 7px 14px;
+        font-size: 0.76rem;
+        color: var(--muted);
+      }
+      .trust-badge .icon {
+        font-size: 0.85rem;
+      }
+
+      /* ── Footer ── */
+      footer {
+        padding: 20px 40px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      /* ── Animations ── */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── Error message ── */
+      #errorMsg {
+        display: none;
+        margin-top: 14px;
+        font-size: 0.82rem;
+        color: var(--danger);
+        text-align: center;
+      }
+
+      /* ── Spinner ── */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--navy);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+
+      @media (max-width: 480px) {
+        header {
+          padding: 18px 20px;
+        }
+        .connect-card {
+          padding: 26px 22px;
+        }
+        footer {
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- ── Header ── -->
+      <header>
+        <div class="logo">
+          <div class="logo-icon">⛓</div>
+          <div class="logo-text">Certify<span>Chain</span></div>
+        </div>
+        <div class="header-tag">BOWEN UNIVERSITY · ETHEREUM NETWORK</div>
+      </header>
+
+      <!-- ── Hero ── -->
+      <main class="hero">
+        <p class="eyebrow">Blockchain Certificate Verification</p>
+
+        <h1 class="hero-title">
+          Trust, Verified<br />
+          <span class="accent">On-Chain.</span>
+        </h1>
+
+        <p class="hero-sub">
+          Academic credentials secured on the Ethereum blockchain. Tamper-proof,
+          instant, and globally verifiable.
+        </p>
+
+        <!-- Connect Card -->
+        <div class="connect-card">
+          <h3>Connect Your Wallet</h3>
+          <p>
+            Connect your MetaMask wallet to continue. Your role will be detected
+            automatically from the blockchain.
+          </p>
+
+          <div id="walletStatus">
+            <span class="status-dot"></span>
+            <span id="walletText">No wallet connected</span>
+          </div>
+
+          <button class="btn-connect btn-primary-gold" id="connectBtn">
+            <span id="btnIcon">🦊</span>
+            <span id="btnText">Connect MetaMask</span>
+          </button>
+
+          <div id="loadingMessage">
+            <span class="dot-pulse">Checking role on blockchain</span>
+          </div>
+
+          <div id="errorMsg"></div>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="trust-row">
+          <div class="trust-badge">
+            <span class="icon">🔒</span> Immutable Records
+          </div>
+          <div class="trust-badge">
+            <span class="icon">⚡</span> Instant Verification
+          </div>
+          <div class="trust-badge">
+            <span class="icon">🌐</span> Decentralized
+          </div>
+          <div class="trust-badge">
+            <span class="icon">🎓</span> NUC Accredited
+          </div>
+        </div>
+      </main>
+
+      <!-- ── Footer ── -->
+      <footer>
+        <span>© 2026 CertifyChain · Bowen University, Iwo</span>
+        <span
+          style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem"
+        >
+          Powered by Ethereum
+        </span>
+      </footer>
+    </div>
+
+    <script src="role.js"></script>
+  </body>
+</html>

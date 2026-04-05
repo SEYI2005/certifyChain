@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bowen Admin — CertifyChain Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <!-- QRCode.js — generates QR codes in the browser with no external API needed -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --navy: #0a0f1e;
+        --navy-card: #111827;
+        --gold: #c9a84c;
+        --gold-light: #e8c96d;
+        --white: #f5f7fa;
+        --muted: #8892a4;
+        --border: rgba(255, 255, 255, 0.07);
+        --success: #22c55e;
+        --danger: #ef4444;
+      }
+      body {
+        font-family: "Sora", sans-serif;
+        background-color: #f0f2f5;
+        color: #1a1a2e;
+      }
+
+      /* ── Header ── */
+      header {
+        background: linear-gradient(90deg, #003d82, #005cbf);
+        color: #fff;
+        padding: 0 30px;
+        height: 64px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .header-title {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .header-title span {
+        color: var(--gold-light);
+      }
+      .admin-info-panel {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .admin-chip {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 6px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+      .chip-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.55);
+        text-transform: uppercase;
+      }
+      .chip-value {
+        font-weight: 600;
+        font-size: 0.78rem;
+        color: #fff;
+      }
+      .code-chip {
+        background: rgba(201, 168, 76, 0.2);
+        border-color: rgba(201, 168, 76, 0.4);
+      }
+      .code-chip .chip-value {
+        color: var(--gold-light);
+      }
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+
+      /* ── Toasts ── */
+      #notificationArea {
+        position: fixed;
+        top: 72px;
+        right: 20px;
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 360px;
+      }
+      .notify-toast {
+        background: var(--navy-card);
+        border-left: 4px solid var(--success);
+        border-radius: 10px;
+        padding: 14px 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.4s ease;
+        font-size: 0.82rem;
+        color: var(--white);
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(120%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .notify-title {
+        font-weight: 700;
+        color: var(--success);
+        margin-bottom: 4px;
+      }
+      .notify-code {
+        font-family: "JetBrains Mono", monospace;
+        background: rgba(34, 197, 94, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: var(--success);
+      }
+
+      /* ── Main ── */
+      main {
+        padding: 28px;
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      /* ── Profile card ── */
+      .profile-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 22px 26px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 20px;
+        border-left: 4px solid #003d82;
+      }
+      .profile-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #003d82, #0056b3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #fff;
+      }
+      .profile-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1a1a2e;
+      }
+      .profile-school {
+        font-size: 0.82rem;
+        color: #555;
+        margin-top: 2px;
+      }
+      .profile-meta {
+        display: flex;
+        gap: 18px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .meta-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        color: #999;
+        text-transform: uppercase;
+      }
+      .meta-value {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #333;
+      }
+      .doc-hash {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        color: #999;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 4px 8px;
+        word-break: break-all;
+        max-width: 300px;
+      }
+
+      /* ── Section cards ── */
+      section {
+        background: #fff;
+        padding: 24px;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        margin-bottom: 24px;
+      }
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .section-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* ── Document preview panel ── */
+      .doc-preview-panel {
+        display: none;
+        background: #f8f9fc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        margin-top: 20px;
+        overflow: hidden;
+      }
+      .doc-preview-header {
+        background: #003d82;
+        color: #fff;
+        padding: 10px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .preview-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        min-height: 500px;
+      }
+      .doc-viewer {
+        border-right: 1px solid #e2e8f0;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      .doc-viewer-label {
+        padding: 10px 14px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8f9fc;
+      }
+      #docPreviewContent {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        min-height: 460px;
+      }
+      #docPreviewContent img {
+        max-width: 100%;
+        max-height: 440px;
+        object-fit: contain;
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      #docPreviewContent iframe {
+        width: 100%;
+        height: 440px;
+        border: none;
+        border-radius: 6px;
+      }
+      .doc-details {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .doc-details-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .detail-row {
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f2f5;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-field {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        color: #999;
+        text-transform: uppercase;
+      }
+      .detail-value {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #1a1a2e;
+      }
+      .detail-hint {
+        font-size: 0.72rem;
+        color: #888;
+        margin-top: 2px;
+        font-style: italic;
+      }
+
+      /* Confirmation */
+      .confirmation-area {
+        padding: 16px 20px;
+        border-top: 2px solid #e2e8f0;
+        background: #fffbeb;
+      }
+      .confirm-instruction {
+        font-size: 0.82rem;
+        color: #555;
+        margin-bottom: 12px;
+        line-height: 1.6;
+      }
+      .confirm-checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .confirm-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.82rem;
+        color: #333;
+        cursor: pointer;
+      }
+      .confirm-check input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: #003d82;
+      }
+      #issueBtn {
+        display: none;
+        font-family: "Sora", sans-serif;
+        font-weight: 700;
+      }
+
+      /* ── QR Code Success Section ── */
+      .qr-success-section {
+        display: none;
+        margin-top: 24px;
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border: 2px solid #86efac;
+        border-radius: 16px;
+        overflow: hidden;
+        animation: fadeUp 0.5s ease forwards;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .qr-success-header {
+        background: #16a34a;
+        color: #fff;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+
+      .qr-success-body {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0;
+      }
+
+      /* QR code display area */
+      .qr-code-area {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        border-right: 1px solid #bbf7d0;
+        background: #fff;
+        min-width: 220px;
+      }
+      .qr-code-area .qr-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #166534;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      #qrcode-container {
+        /* QRCode.js renders inside here */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #qrcode-container canvas,
+      #qrcode-container img {
+        border-radius: 8px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      }
+      .qr-scan-hint {
+        font-size: 0.72rem;
+        color: #888;
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      /* Certificate details area */
+      .cert-details-area {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .cert-id-display {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+        border-radius: 8px;
+        padding: 10px 14px;
+        word-break: break-all;
+      }
+      .cert-id-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #166534;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .cert-meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .cert-meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .cert-meta-label {
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .cert-meta-value {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1a1a2e;
+      }
+
+      /* Action buttons row */
+      .qr-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .btn-download-qr {
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-family: "Sora", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-download-qr:hover {
+        background: #15803d;
+        transform: translateY(-1px);
+      }
+      .btn-copy-id {
+        background: transparent;
+        color: #166534;
+        border: 1px solid #86efac;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-family: "Sora", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-copy-id:hover {
+        background: #f0fdf4;
+      }
+
+      /* Verify URL display */
+      .verify-url-box {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        color: #666;
+        word-break: break-all;
+        line-height: 1.5;
+      }
+      .verify-url-label {
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 4px;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      /* Form */
+      .form-label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #555;
+      }
+      .form-control,
+      .form-select {
+        font-family: "Sora", sans-serif;
+        font-size: 0.88rem;
+        border-color: #e2e8f0;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #003d82;
+        box-shadow: none;
+      }
+      #programmeStatus {
+        font-size: 0.72rem;
+        margin-top: 4px;
+        min-height: 18px;
+      }
+
+      /* Table */
+      .table th {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #999;
+      }
+      .badge-valid {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .badge-revoked {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      /* Spinner */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid #003d82;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+      }
+      .spinner-white {
+        width: 14px;
+        height: 14px;
+        border: 2px solid #fff;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+      }
+
+      @media (max-width: 768px) {
+        .preview-layout {
+          grid-template-columns: 1fr;
+        }
+        .doc-viewer {
+          border-right: none;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .qr-success-body {
+          grid-template-columns: 1fr;
+        }
+        .qr-code-area {
+          border-right: none;
+          border-bottom: 1px solid #bbf7d0;
+        }
+        .profile-card {
+          grid-template-columns: auto 1fr;
+        }
+        .profile-card > div:last-child {
+          display: none;
+        }
+        .cert-meta-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="notificationArea"></div>
+
+    <!-- ── Header ── -->
+    <header>
+      <div class="header-left">
+        <div class="logo-icon">⛓</div>
+        <div>
+          <div class="header-title">Certify<span>Chain</span></div>
+          <div
+            style="
+              font-size: 0.6rem;
+              opacity: 0.6;
+              font-family: 'JetBrains Mono', monospace;
+              letter-spacing: 0.08em;
+            "
+          >
+            ADMIN DASHBOARD
+          </div>
+        </div>
+      </div>
+      <div class="admin-info-panel">
+        <div class="admin-chip">
+          <span class="chip-label">Admin</span>
+          <span class="chip-value" id="headerName">Loading...</span>
+        </div>
+        <div class="admin-chip">
+          <span class="chip-label">Institution</span>
+          <span class="chip-value" id="headerSchool">Loading...</span>
+        </div>
+        <div class="admin-chip code-chip">
+          <span class="chip-label">Shared Code</span>
+          <span class="chip-value" id="headerCode">Loading...</span>
+        </div>
+        <div class="pulse-dot"></div>
+        <button
+          class="btn btn-sm btn-light"
+          onclick="logout()"
+          style="font-family: 'Sora', sans-serif; font-size: 0.8rem"
+        >
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ── Profile Card ── -->
+      <div class="profile-card">
+        <div class="profile-avatar">🏫</div>
+        <div>
+          <div class="profile-name" id="profileName">
+            Loading profile from blockchain...
+          </div>
+          <div class="profile-school" id="profileSchool"></div>
+          <div class="profile-meta">
+            <div class="meta-item">
+              <span class="meta-label">Email</span>
+              <span class="meta-value" id="profileEmail">—</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">NUC Code</span>
+              <span class="meta-value" id="profileNucCode">—</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Registered</span>
+              <span class="meta-value" id="profileJoined">—</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Wallet</span>
+              <span class="meta-value" id="profileWallet">—</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="meta-label" style="margin-bottom: 6px">
+            NUC Document Hash (on-chain)
+          </div>
+          <div class="doc-hash" id="profileDocHash">Loading...</div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 1: Issue Certificate ── -->
+      <section>
+        <div class="section-head">
+          <div class="section-title">
+            📄 <span style="color: #1d4ed8">Issue New Certificate</span>
+          </div>
+          <span
+            style="
+              font-size: 0.72rem;
+              color: #999;
+              font-family: 'JetBrains Mono', monospace;
+            "
+          >
+            Programme-validated · Manually verified · QR auto-generated
+          </span>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Upload Certificate Document</label>
+            <input
+              type="file"
+              id="certFile"
+              class="form-control mb-2"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onchange="onFileSelected()"
+            />
+
+            <!-- Duplicate document warning — shown when same file uploaded twice -->
+            <div
+              id="duplicateDocWarning"
+              style="display: none; margin-bottom: 12px"
+            >
+              <div
+                style="
+                  background: #fef2f2;
+                  border: 1px solid #fca5a5;
+                  border-radius: 8px;
+                  padding: 12px 14px;
+                  font-size: 0.82rem;
+                  color: #991b1b;
+                  line-height: 1.6;
+                "
+              >
+                ⚠️ <strong>Duplicate Document Detected</strong><br />
+                This file has already been issued as a certificate on the
+                blockchain. The same document cannot be used for two different
+                certificates. Please upload the correct original document for
+                this student.
+              </div>
+            </div>
+
+            <label class="form-label">Student Full Name</label>
+            <input
+              type="text"
+              id="studentName"
+              class="form-control mb-3"
+              placeholder="e.g. Oluwaseyifunmi Alonge"
+            />
+
+            <label class="form-label">Programme</label>
+            <select
+              id="certType"
+              class="form-select mb-1"
+              onchange="onProgrammeChange()"
+            >
+              <option value="">Select Programme...</option>
+            </select>
+            <div id="programmeStatus"></div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Institution</label>
+            <input
+              type="text"
+              id="school"
+              class="form-control mb-3"
+              value="Bowen University"
+              readonly
+            />
+
+            <label class="form-label">Graduation Year</label>
+            <input
+              type="number"
+              id="gradDate"
+              class="form-control mb-3"
+              placeholder="e.g. 2026"
+              min="1980"
+              max="2100"
+            />
+
+            <label class="form-label">Degree Classification</label>
+            <select id="degreeClass" class="form-select mb-4">
+              <option value="">Select Classification...</option>
+              <option value="First Class Honours">First Class Honours</option>
+              <option value="Second Class Upper Honours">
+                Second Class Upper Honours
+              </option>
+              <option value="Second Class Lower Honours">
+                Second Class Lower Honours
+              </option>
+              <option value="Third Class Honours">Third Class Honours</option>
+              <option value="Pass">Pass</option>
+              <option value="Distinction">Distinction</option>
+              <option value="Merit">Merit</option>
+            </select>
+
+            <button
+              class="btn btn-outline-primary w-100"
+              onclick="showPreviewPanel()"
+              style="font-family: 'Sora', sans-serif; font-weight: 600"
+            >
+              👁 Preview & Verify Details
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Document Preview Panel ── -->
+        <div class="doc-preview-panel" id="docPreviewPanel">
+          <div class="doc-preview-header">
+            📋 Manual Verification — Compare document with entered details
+          </div>
+          <div class="preview-layout">
+            <div class="doc-viewer">
+              <div class="doc-viewer-label">📄 Uploaded Certificate</div>
+              <div id="docPreviewContent">
+                <span class="text-muted" style="font-size: 0.85rem"
+                  >No file loaded</span
+                >
+              </div>
+            </div>
+            <div class="doc-details">
+              <div class="doc-details-label">📝 Details You Entered</div>
+              <div class="detail-row">
+                <span class="detail-field">Student Name</span>
+                <span class="detail-value" id="preview-name">—</span>
+                <span class="detail-hint"
+                  >Check the name matches exactly as on the document</span
+                >
+              </div>
+              <div class="detail-row">
+                <span class="detail-field">Programme</span>
+                <span class="detail-value" id="preview-programme">—</span>
+                <span class="detail-hint"
+                  >Check the degree and programme name</span
+                >
+              </div>
+              <div class="detail-row">
+                <span class="detail-field">Degree Classification</span>
+                <span class="detail-value" id="preview-class">—</span>
+                <span class="detail-hint"
+                  >Check the class of degree stated</span
+                >
+              </div>
+              <div class="detail-row">
+                <span class="detail-field">Graduation Year</span>
+                <span class="detail-value" id="preview-year">—</span>
+                <span class="detail-hint">Check the year of award</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-field">Institution</span>
+                <span class="detail-value">Bowen University</span>
+                <span class="detail-hint">Check the institution name</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirmation checklist -->
+          <div class="confirmation-area">
+            <div class="confirm-instruction">
+              <strong
+                >Tick each box after verifying against the document on the
+                left:</strong
+              >
+            </div>
+            <div class="confirm-checklist">
+              <label class="confirm-check">
+                <input
+                  type="checkbox"
+                  id="check1"
+                  onchange="checkAllConfirmed()"
+                />
+                The student name matches what I entered
+              </label>
+              <label class="confirm-check">
+                <input
+                  type="checkbox"
+                  id="check2"
+                  onchange="checkAllConfirmed()"
+                />
+                The programme and degree level match what I selected
+              </label>
+              <label class="confirm-check">
+                <input
+                  type="checkbox"
+                  id="check3"
+                  onchange="checkAllConfirmed()"
+                />
+                The graduation year matches what I entered
+              </label>
+              <label class="confirm-check">
+                <input
+                  type="checkbox"
+                  id="check4"
+                  onchange="checkAllConfirmed()"
+                />
+                The degree classification matches what I selected
+              </label>
+              <label class="confirm-check">
+                <input
+                  type="checkbox"
+                  id="check5"
+                  onchange="checkAllConfirmed()"
+                />
+                This certificate is genuine and was issued by Bowen University
+              </label>
+            </div>
+            <button
+              class="btn btn-success w-100 py-2"
+              id="issueBtn"
+              onclick="issueCert()"
+            >
+              ⛓ All Verified — Issue to Blockchain
+            </button>
+            <div
+              style="
+                font-size: 0.72rem;
+                color: #888;
+                text-align: center;
+                margin-top: 8px;
+              "
+            >
+              All boxes must be ticked. This action is permanent and cannot be
+              undone.
+            </div>
+          </div>
+        </div>
+
+        <!-- ── QR Code + Certificate Success Section ── -->
+        <div class="qr-success-section" id="qrSuccessSection">
+          <div class="qr-success-header">
+            ✅ Certificate Issued to Blockchain — QR Code Generated
+          </div>
+
+          <div class="qr-success-body">
+            <!-- LEFT: QR Code -->
+            <div class="qr-code-area">
+              <div class="qr-label">Scan to Verify</div>
+
+              <!-- QRCode.js renders the QR code canvas here -->
+              <div id="qrcode-container"></div>
+
+              <div class="qr-scan-hint">
+                Employer or student scans this<br />with any camera or QR app
+              </div>
+            </div>
+
+            <!-- RIGHT: Certificate details + actions -->
+            <div class="cert-details-area">
+              <div>
+                <div class="cert-id-label">Certificate ID</div>
+                <div class="cert-id-display" id="displayCertId">—</div>
+              </div>
+
+              <div class="cert-meta-grid">
+                <div class="cert-meta-item">
+                  <span class="cert-meta-label">Student</span>
+                  <span class="cert-meta-value" id="issued-name">—</span>
+                </div>
+                <div class="cert-meta-item">
+                  <span class="cert-meta-label">Year</span>
+                  <span class="cert-meta-value" id="issued-year">—</span>
+                </div>
+                <div class="cert-meta-item" style="grid-column: 1 / -1">
+                  <span class="cert-meta-label">Programme</span>
+                  <span class="cert-meta-value" id="issued-prog">—</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="verify-url-label">
+                  Verification URL (encoded in QR)
+                </div>
+                <div class="verify-url-box" id="verifyUrlDisplay">—</div>
+              </div>
+
+              <div class="qr-actions">
+                <button class="btn-download-qr" onclick="downloadQR()">
+                  ⬇ Download QR Code
+                </button>
+                <button class="btn-copy-id" onclick="copyCertId()">
+                  📋 Copy Certificate ID
+                </button>
+              </div>
+
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #888;
+                  line-height: 1.5;
+                  margin-top: 4px;
+                "
+              >
+                The QR code and Certificate ID both link to the same
+                verification page. Share either one with the certificate holder.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 2: Revoke ── -->
+      <section>
+        <div class="section-head">
+          <div class="section-title">
+            🚫 <span style="color: #dc2626">Revoke Certificate</span>
+          </div>
+        </div>
+        <div class="row align-items-start">
+          <div class="col-md-8">
+            <input
+              type="text"
+              id="revokeCertId"
+              class="form-control mb-2"
+              placeholder="Enter Certificate ID — e.g. BOWEN-CS-2026-1234"
+            />
+            <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="confirmRevokeCheck"
+              />
+              <label
+                class="form-check-label text-danger"
+                for="confirmRevokeCheck"
+              >
+                I confirm this certificate should be permanently revoked on the
+                blockchain.
+              </label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <button
+              class="btn btn-outline-danger w-100"
+              id="revokeBtn"
+              onclick="revokeCert()"
+              style="font-family: 'Sora', sans-serif; font-weight: 600"
+            >
+              🚫 Revoke Record
+            </button>
+          </div>
+        </div>
+        <div id="revokeMsg" class="mt-2 fw-semibold"></div>
+      </section>
+
+      <!-- ── SECTION 3: Ledger ── -->
+      <section>
+        <div class="section-head">
+          <div class="section-title">
+            📋 Blockchain Ledger — All Issued Certificates
+          </div>
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            onclick="loadLedger()"
+            style="font-family: 'Sora', sans-serif; font-size: 0.8rem"
+          >
+            🔄 Refresh
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Certificate ID</th>
+                <th>Student Name</th>
+                <th>Programme</th>
+                <th>Graduation</th>
+                <th>Issued On</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerTableBody">
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                  <span class="spinner"></span> Loading from blockchain...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // ============================================================
+      //  CONTRACT CONFIG — update after each redeployment
+      // ============================================================
+      const CONTRACT_ADDRESS = "0xD01DeE3c241DdbfE94C62CBeCf8fFB2060764383";
+
+      const CONTRACT_ABI = [
+        {
+          inputs: [
+            { internalType: "address", name: "_admin", type: "address" },
+          ],
+          name: "getAdminProfile",
+          outputs: [
+            { internalType: "string", name: "name", type: "string" },
+            { internalType: "string", name: "email", type: "string" },
+            { internalType: "string", name: "schoolName", type: "string" },
+            { internalType: "string", name: "nucCode", type: "string" },
+            { internalType: "string", name: "nucDocHash", type: "string" },
+            { internalType: "string", name: "joinCode", type: "string" },
+            { internalType: "uint256", name: "registeredAt", type: "uint256" },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCurrentCode",
+          outputs: [{ internalType: "string", name: "", type: "string" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "string", name: "_certificateID", type: "string" },
+            { internalType: "string", name: "_studentName", type: "string" },
+            {
+              internalType: "string",
+              name: "_certificateType",
+              type: "string",
+            },
+            { internalType: "string", name: "_school", type: "string" },
+            { internalType: "string", name: "_graduationDate", type: "string" },
+            {
+              internalType: "string",
+              name: "_certificateHash",
+              type: "string",
+            },
+          ],
+          name: "issueCertificate",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "string", name: "_certificateID", type: "string" },
+          ],
+          name: "revokeCertificate",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          // Duplicate document check — called on file select before MetaMask fires
+          inputs: [
+            {
+              internalType: "string",
+              name: "_certificateHash",
+              type: "string",
+            },
+          ],
+          name: "isDocumentAlreadyIssued",
+          outputs: [{ internalType: "bool", name: "", type: "bool" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getAllIssuedCertificates",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "certificateID",
+                  type: "string",
+                },
+                { internalType: "string", name: "studentName", type: "string" },
+                {
+                  internalType: "string",
+                  name: "certificateType",
+                  type: "string",
+                },
+                { internalType: "string", name: "school", type: "string" },
+                {
+                  internalType: "string",
+                  name: "graduationDate",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "certificateHash",
+                  type: "string",
+                },
+                { internalType: "uint256", name: "timestamp", type: "uint256" },
+                { internalType: "bool", name: "isValid", type: "bool" },
+                { internalType: "bool", name: "isIssued", type: "bool" },
+              ],
+              internalType: "struct CertifyChain.Certificate[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newAdmin",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "newAdminCode",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "schoolName",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "AdminAdded",
+          type: "event",
+        },
+      ];
+
+      // ============================================================
+      //  BOWEN PROGRAMMES (from universities_file)
+      // ============================================================
+      const BOWEN_PROGRAMMES = [
+        {
+          name: "ACCOUNTING",
+          degreeLevel: "B.Sc",
+          faculty: "ADMINISTRATION",
+          status: "Full",
+        },
+        {
+          name: "BANKING AND FINANCE",
+          degreeLevel: "B.Sc",
+          faculty: "ADMINISTRATION",
+          status: "Full",
+        },
+        {
+          name: "BUSINESS ADMINISTRATION",
+          degreeLevel: "B.Sc",
+          faculty: "ADMINISTRATION",
+          status: null,
+        },
+        {
+          name: "INDUSTRIAL RELATIONS AND PERSONNEL MANAGEMENT",
+          degreeLevel: "B.Sc",
+          faculty: "ADMINISTRATION",
+          status: "Full",
+        },
+        {
+          name: "AGRICULTURE",
+          degreeLevel: "B.Sc",
+          faculty: "AGRICULTURE",
+          status: "Full",
+        },
+        {
+          name: "AGRIC. EXTENSION AND SOCIAL ENGINEERING",
+          degreeLevel: "B.Sc",
+          faculty: "AGRICULTURE",
+          status: null,
+        },
+        {
+          name: "ARCHITECTURE",
+          degreeLevel: "B.Sc",
+          faculty: "ARCHITECTURE",
+          status: "Full",
+        },
+        {
+          name: "ICON ARTS",
+          degreeLevel: "B.A",
+          faculty: "ARTS/LIBERAL STUDIES",
+          status: "Full",
+        },
+        {
+          name: "ENGLISH LANGUAGE",
+          degreeLevel: "B.A",
+          faculty: "ARTS/LIBERAL STUDIES",
+          status: "Full",
+        },
+        {
+          name: "HISTORY AND INTERNATIONAL STUDIES",
+          degreeLevel: "B.A",
+          faculty: "ARTS/LIBERAL STUDIES",
+          status: "Full",
+        },
+        {
+          name: "RELIGIOUS STUDIES",
+          degreeLevel: "B.A",
+          faculty: "ARTS/LIBERAL STUDIES",
+          status: "Full",
+        },
+        {
+          name: "THEATRE ARTS",
+          degreeLevel: "B.A",
+          faculty: "ARTS/LIBERAL STUDIES",
+          status: "Full",
+        },
+        {
+          name: "MUSIC",
+          degreeLevel: "B.A",
+          faculty: "ARTS/LIBERAL STUDIES",
+          status: null,
+        },
+        {
+          name: "PHILOSOPHY",
+          degreeLevel: "B.A",
+          faculty: "ARTS/LIBERAL STUDIES",
+          status: null,
+        },
+        {
+          name: "ANATOMY",
+          degreeLevel: "B.Sc",
+          faculty: "HEALTH SCIENCES",
+          status: null,
+        },
+        {
+          name: "PHYSIOLOGY",
+          degreeLevel: "B.Sc",
+          faculty: "HEALTH SCIENCES",
+          status: "Full",
+        },
+        {
+          name: "MEDICINE AND SURGERY",
+          degreeLevel: "MBBS",
+          faculty: "HEALTH SCIENCES",
+          status: "Full",
+        },
+        {
+          name: "NURSING SCIENCE",
+          degreeLevel: "B.NSc",
+          faculty: "HEALTH SCIENCES",
+          status: null,
+        },
+        {
+          name: "PHYSIOTHERAPY",
+          degreeLevel: "B.Physiotherapy",
+          faculty: "HEALTH SCIENCES",
+          status: "Full",
+        },
+        {
+          name: "PUBLIC HEALTH",
+          degreeLevel: "B.Sc",
+          faculty: "HEALTH SCIENCES",
+          status: null,
+        },
+        {
+          name: "MEDICAL LABORATORY SCIENCE",
+          degreeLevel: "BMLS",
+          faculty: "HEALTH SCIENCES",
+          status: "Full",
+        },
+        {
+          name: "NUTRITION AND DIETETICS",
+          degreeLevel: "B.Sc",
+          faculty: "HEALTH SCIENCES",
+          status: null,
+        },
+        {
+          name: "COMPUTER SCIENCE",
+          degreeLevel: "B.Sc",
+          faculty: "COMPUTING & COMMUNICATION",
+          status: "Full",
+        },
+        {
+          name: "INFORMATION TECHNOLOGY",
+          degreeLevel: "B.Sc",
+          faculty: "COMPUTING & COMMUNICATION",
+          status: "Full",
+        },
+        {
+          name: "SOFTWARE ENGINEERING",
+          degreeLevel: "B.Sc",
+          faculty: "COMPUTING & COMMUNICATION",
+          status: "Full",
+        },
+        {
+          name: "CYBER SECURITY",
+          degreeLevel: "B.Sc",
+          faculty: "COMPUTING & COMMUNICATION",
+          status: null,
+        },
+        {
+          name: "MASS COMMUNICATION",
+          degreeLevel: "B.Sc",
+          faculty: "COMPUTING & COMMUNICATION",
+          status: "Full",
+        },
+        {
+          name: "COMMUNICATION ARTS",
+          degreeLevel: "B.A",
+          faculty: "COMPUTING & COMMUNICATION",
+          status: null,
+        },
+        {
+          name: "ELECTRICAL AND ELECTRONICS ENGINEERING",
+          degreeLevel: "B.Eng",
+          faculty: "ENGINEERING",
+          status: "Full",
+        },
+        {
+          name: "MECHANICAL ENGINEERING",
+          degreeLevel: "B.Eng",
+          faculty: "ENGINEERING",
+          status: "Full",
+        },
+        {
+          name: "MECHATRONICS ENGINEERING",
+          degreeLevel: "B.Eng",
+          faculty: "ENGINEERING",
+          status: null,
+        },
+        {
+          name: "SURVEYING AND GEO-INFORMATICS",
+          degreeLevel: "B.Sc",
+          faculty: "ENVIRONMENTAL SCIENCE",
+          status: "Full",
+        },
+        { name: "LAW", degreeLevel: "LL. B.", faculty: "LAW", status: "Full" },
+        {
+          name: "BIOCHEMISTRY",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: "Full",
+        },
+        {
+          name: "INDUSTRIAL CHEMISTRY",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: "Full",
+        },
+        {
+          name: "MATHEMATICS",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: "Full",
+        },
+        {
+          name: "MICROBIOLOGY",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: "Full",
+        },
+        {
+          name: "FOOD SCIENCE AND TECHNOLOGY",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: "Full",
+        },
+        {
+          name: "PURE AND APPLIED BIOLOGY",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: null,
+        },
+        {
+          name: "STATISTICS",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: null,
+        },
+        {
+          name: "PHYSICS",
+          degreeLevel: "B.Sc",
+          faculty: "SCIENCE",
+          status: null,
+        },
+        {
+          name: "ECONOMICS",
+          degreeLevel: "B.Sc",
+          faculty: "SOCIAL SCIENCES",
+          status: null,
+        },
+        {
+          name: "POLITICAL SCIENCE",
+          degreeLevel: "B.Sc",
+          faculty: "SOCIAL SCIENCES",
+          status: null,
+        },
+        {
+          name: "INTERNATIONAL RELATIONS",
+          degreeLevel: "B.Sc",
+          faculty: "SOCIAL SCIENCES",
+          status: "Full",
+        },
+        {
+          name: "SOCIOLOGY",
+          degreeLevel: "B.Sc",
+          faculty: "SOCIAL SCIENCES",
+          status: "Full",
+        },
+      ];
+
+      // ============================================================
+      //  STATE
+      // ============================================================
+      let web3, contract, currentAccount;
+
+      // The verification base URL — what gets embedded in the QR code
+      // Change this to your deployed URL if hosting publicly
+      const BASE_VERIFY_URL =
+        "https://eth-sepolia.g.alchemy.com/v2/kpCCErcVYQBBT7cM_66E8";
+
+      // ============================================================
+      //  INIT
+      // ============================================================
+      window.addEventListener("load", async () => {
+        if (typeof window.ethereum === "undefined") {
+          alert("MetaMask is required.");
+          window.location.href = "role.html";
+          return;
+        }
+        try {
+          web3 = new Web3(window.ethereum);
+          const accounts = await web3.eth.getAccounts();
+          if (!accounts.length) {
+            window.location.href = "role.html";
+            return;
+          }
+          currentAccount = accounts[0];
+          contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+          populateProgrammeDropdown();
+          await Promise.all([
+            loadAdminProfile(),
+            loadCurrentCode(),
+            loadLedger(),
+          ]);
+          listenForNewAdmins();
+        } catch (err) {
+          console.error("Dashboard init:", err);
+        }
+      });
+
+      // ============================================================
+      //  Populate programme dropdown
+      // ============================================================
+      function populateProgrammeDropdown() {
+        const sel = document.getElementById("certType");
+        const byFaculty = {};
+        BOWEN_PROGRAMMES.forEach((p) => {
+          if (!byFaculty[p.faculty]) byFaculty[p.faculty] = [];
+          byFaculty[p.faculty].push(p);
+        });
+        Object.keys(byFaculty)
+          .sort()
+          .forEach((faculty) => {
+            const group = document.createElement("optgroup");
+            group.label = faculty;
+            byFaculty[faculty].forEach((p) => {
+              const opt = document.createElement("option");
+              opt.value = `${p.degreeLevel}|${p.name}`;
+              opt.textContent = `${p.degreeLevel} — ${p.name}`;
+              if (!p.status) opt.style.color = "#999";
+              group.appendChild(opt);
+            });
+            sel.appendChild(group);
+          });
+      }
+
+      function onProgrammeChange() {
+        const val = document.getElementById("certType").value;
+        const status = document.getElementById("programmeStatus");
+        if (!val) {
+          status.innerHTML = "";
+          return;
+        }
+        const [degree, name] = val.split("|");
+        const prog = BOWEN_PROGRAMMES.find(
+          (p) => p.name === name && p.degreeLevel === degree,
+        );
+        if (prog?.status === "Full") {
+          status.innerHTML = `<span style="color:#16a34a;font-size:0.72rem;">✓ Fully accredited — ${prog.faculty}</span>`;
+        } else if (prog) {
+          status.innerHTML = `<span style="color:#d97706;font-size:0.72rem;">⚠ Accreditation pending — ${prog.faculty}</span>`;
+        }
+        if (
+          document.getElementById("docPreviewPanel").style.display !== "none"
+        ) {
+          updatePreviewDetails();
+        }
+      }
+
+      async function onFileSelected() {
+        const file = document.getElementById("certFile").files[0];
+        const preview = document.getElementById("docPreviewContent");
+        if (!file) return;
+
+        // Render document preview
+        if (preview._objectURL) URL.revokeObjectURL(preview._objectURL);
+        const url = URL.createObjectURL(file);
+        preview._objectURL = url;
+        if (file.type === "application/pdf") {
+          preview.innerHTML = `<iframe src="${url}"></iframe>`;
+        } else if (file.type.startsWith("image/")) {
+          preview.innerHTML = `<img src="${url}" alt="Certificate preview" />`;
+        } else {
+          preview.innerHTML = `<div class="text-center text-muted" style="padding:40px;">
+        <div style="font-size:2rem;margin-bottom:8px;">📎</div>
+        <div style="font-size:0.85rem;">${file.name}</div>
+      </div>`;
+        }
+        resetConfirmation();
+
+        // ── Duplicate document check ──
+        // Hash the file immediately on selection and ask the blockchain
+        // if this document has already been issued before.
+        // This fires BEFORE the admin fills any other fields or clicks anything,
+        // so they get a clear warning immediately.
+        if (!contract) return; // contract not ready yet (page still loading)
+
+        try {
+          const buffer = await file.arrayBuffer();
+          const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+          const certHash = Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+
+          // Store hash on the file object so issueCert() can reuse it
+          file._sha256 = certHash;
+
+          const alreadyIssued = await contract.methods
+            .isDocumentAlreadyIssued(certHash)
+            .call();
+
+          if (alreadyIssued) {
+            // Show a prominent warning — disable the preview button so
+            // admin must acknowledge before proceeding
+            const warning = document.getElementById("duplicateDocWarning");
+            warning.style.display = "block";
+            document.getElementById("previewBtn").disabled = true;
+            document.getElementById("previewBtn").style.opacity = "0.5";
+          } else {
+            // Document is new — clear any previous warning
+            document.getElementById("duplicateDocWarning").style.display =
+              "none";
+            document.getElementById("previewBtn").disabled = false;
+            document.getElementById("previewBtn").style.opacity = "1";
+          }
+        } catch (err) {
+          // If the check fails (e.g. node not running), just continue silently
+          // The contract will still reject it on-chain if it's a duplicate
+          console.warn("Duplicate check failed:", err.message);
+        }
+      }
+
+      function showPreviewPanel() {
+        const file = document.getElementById("certFile").files[0];
+        const name = document.getElementById("studentName").value.trim();
+        const certType = document.getElementById("certType").value;
+        const year = document.getElementById("gradDate").value.trim();
+        const cls = document.getElementById("degreeClass").value;
+        if (!file)
+          return alert("❌ Please upload the certificate document first.");
+        if (!name) return alert("❌ Please enter the student's full name.");
+        if (!certType) return alert("❌ Please select a programme.");
+        if (!year) return alert("❌ Please enter the graduation year.");
+        if (!cls) return alert("❌ Please select the degree classification.");
+        updatePreviewDetails();
+        resetConfirmation();
+        const panel = document.getElementById("docPreviewPanel");
+        panel.style.display = "block";
+        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      function updatePreviewDetails() {
+        const certType = document.getElementById("certType").value;
+        const [degree, name] = certType ? certType.split("|") : ["—", "—"];
+        document.getElementById("preview-name").innerText =
+          document.getElementById("studentName").value.trim() || "—";
+        document.getElementById("preview-programme").innerText = certType
+          ? `${degree} — ${name}`
+          : "—";
+        document.getElementById("preview-class").innerText =
+          document.getElementById("degreeClass").value || "—";
+        document.getElementById("preview-year").innerText =
+          document.getElementById("gradDate").value.trim() || "—";
+      }
+
+      function checkAllConfirmed() {
+        const allChecked = [
+          "check1",
+          "check2",
+          "check3",
+          "check4",
+          "check5",
+        ].every((id) => document.getElementById(id).checked);
+        const btn = document.getElementById("issueBtn");
+        btn.style.display = "block";
+        btn.disabled = !allChecked;
+      }
+
+      function resetConfirmation() {
+        ["check1", "check2", "check3", "check4", "check5"].forEach((id) => {
+          document.getElementById(id).checked = false;
+        });
+        const btn = document.getElementById("issueBtn");
+        btn.style.display = "none";
+        btn.disabled = true;
+      }
+
+      // ============================================================
+      //  ISSUE CERTIFICATE — generates QR automatically on success
+      // ============================================================
+      async function issueCert() {
+        const file = document.getElementById("certFile").files[0];
+        const name = document.getElementById("studentName").value.trim();
+        const certType = document.getElementById("certType").value;
+        const year = document.getElementById("gradDate").value.trim();
+        const cls = document.getElementById("degreeClass").value;
+
+        const [degree, progName] = certType.split("|");
+        const fullProg = `${degree} ${progName} (${cls})`;
+
+        const btn = document.getElementById("issueBtn");
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-white"></span> Sending to blockchain...`;
+
+        try {
+          // 1. Hash the certificate file
+          const buffer = await file.arrayBuffer();
+          const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+          const certHash = Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+
+          // 2. Generate a unique Certificate ID
+          const certId = generateCertID(progName, year);
+
+          // 3. Send to Ethereum blockchain via MetaMask
+          await contract.methods
+            .issueCertificate(
+              certId,
+              name,
+              fullProg,
+              "Bowen University",
+              year,
+              certHash,
+            )
+            .send({ from: currentAccount });
+
+          // 4. Blockchain confirmed — now generate QR code automatically
+          generateAndShowQR(certId, name, fullProg, year);
+
+          // 5. Hide the preview panel
+          document.getElementById("docPreviewPanel").style.display = "none";
+
+          // 6. Refresh the ledger
+          await loadLedger();
+        } catch (err) {
+          console.error(err);
+          btn.disabled = false;
+          btn.innerHTML = "⛓ All Verified — Issue to Blockchain";
+          alert(
+            err.code === 4001
+              ? "❌ Transaction cancelled in MetaMask."
+              : "❌ Transaction failed: " + (err.message || "Unknown error"),
+          );
+        }
+      }
+
+      // ============================================================
+      //  Generate QR Code and show success section
+      //
+      //  QRCode.js is used here — it's already loaded from the CDN
+      //  at the top of the page. It works entirely in the browser
+      //  with no external API call needed.
+      //
+      //  The QR code encodes a URL in this format:
+      //  http://localhost:3000/verify.html?id=BOWEN-CS-2026-1234
+      //
+      //  When scanned, the browser opens verify.html which reads
+      //  the ?id= parameter and auto-verifies against the blockchain.
+      // ============================================================
+      function generateAndShowQR(certId, name, programme, year) {
+        // Build the verification URL that gets embedded in the QR code
+        const verifyURL = `${BASE_VERIFY_URL}?id=${certId}`;
+
+        // Clear any previous QR code
+        const container = document.getElementById("qrcode-container");
+        container.innerHTML = "";
+
+        // Generate QR code using QRCode.js
+        // The library draws a canvas element inside the container div
+        new QRCode(container, {
+          text: verifyURL, // The URL encoded in the QR
+          width: 180, // Size in pixels
+          height: 180,
+          colorDark: "#003d82", // Bowen blue dots
+          colorLight: "#ffffff", // White background
+          correctLevel: QRCode.CorrectLevel.H, // Highest error correction
+        });
+
+        // Fill in the certificate details on the right side
+        document.getElementById("displayCertId").innerText = certId;
+        document.getElementById("issued-name").innerText = name;
+        document.getElementById("issued-prog").innerText = programme;
+        document.getElementById("issued-year").innerText = year;
+        document.getElementById("verifyUrlDisplay").innerText = verifyURL;
+
+        // Show the success section with smooth animation
+        const section = document.getElementById("qrSuccessSection");
+        section.style.display = "block";
+        section.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // ============================================================
+      //  Download QR code as PNG image
+      //  QRCode.js renders to a <canvas> element — we export it
+      // ============================================================
+      function downloadQR() {
+        // QRCode.js renders either a canvas or an img depending on browser
+        const canvas = document.querySelector("#qrcode-container canvas");
+        const img = document.querySelector("#qrcode-container img");
+
+        const certId = document.getElementById("displayCertId").innerText;
+
+        if (canvas) {
+          // Canvas — convert to PNG data URL and trigger download
+          const a = document.createElement("a");
+          a.download = `${certId}-QR.png`;
+          a.href = canvas.toDataURL("image/png");
+          a.click();
+        } else if (img) {
+          // Fallback if QRCode.js used an img element
+          const a = document.createElement("a");
+          a.download = `${certId}-QR.png`;
+          a.href = img.src;
+          a.click();
+        } else {
+          alert("QR code not found. Please issue a certificate first.");
+        }
+      }
+
+      // ============================================================
+      //  Copy Certificate ID to clipboard
+      // ============================================================
+      function copyCertId() {
+        const certId = document.getElementById("displayCertId").innerText;
+        navigator.clipboard.writeText(certId).then(() => {
+          const btn = document.querySelector(".btn-copy-id");
+          const original = btn.innerHTML;
+          btn.innerHTML = "✅ Copied!";
+          setTimeout(() => {
+            btn.innerHTML = original;
+          }, 2000);
+        });
+      }
+
+      // ============================================================
+      //  Generate Certificate ID
+      // ============================================================
+      function generateCertID(progName, year) {
+        const map = {
+          "COMPUTER SCIENCE": "CS",
+          "SOFTWARE ENGINEERING": "SE",
+          "INFORMATION TECHNOLOGY": "IT",
+          "CYBER SECURITY": "CY",
+          "ELECTRICAL AND ELECTRONICS": "EE",
+          "MECHANICAL ENGINEERING": "ME",
+          MECHATRONICS: "MCH",
+          ACCOUNTING: "ACC",
+          "BANKING AND FINANCE": "BF",
+          "MEDICINE AND SURGERY": "MB",
+          "NURSING SCIENCE": "NS",
+          LAW: "LW",
+          BIOCHEMISTRY: "BC",
+          MATHEMATICS: "MAT",
+          "MASS COMMUNICATION": "MC",
+          ARCHITECTURE: "ARC",
+          MICROBIOLOGY: "MIB",
+          ECONOMICS: "ECO",
+          "INTERNATIONAL RELATIONS": "IR",
+          SOCIOLOGY: "SOC",
+          PHYSIOLOGY: "PHY",
+          PHYSICS: "PHY2",
+          STATISTICS: "STA",
+          "ENGLISH LANGUAGE": "ENG",
+          SURVEYING: "SVG",
+          AGRICULTURE: "AGR",
+          "MEDICAL LABORATORY": "MLS",
+          PHYSIOTHERAPY: "PT",
+          "PUBLIC HEALTH": "PH",
+          NUTRITION: "ND",
+        };
+        const upper = progName.toUpperCase();
+        const code = Object.keys(map).find((k) => upper.includes(k));
+        const rand = Math.floor(Math.random() * 9000) + 1000;
+        return `BOWEN-${map[code] || "GEN"}-${year}-${rand}`;
+      }
+
+      // ============================================================
+      //  Load Admin Profile
+      // ============================================================
+      async function loadAdminProfile() {
+        try {
+          const p = await contract.methods
+            .getAdminProfile(currentAccount)
+            .call({ from: currentAccount });
+          document.getElementById("headerName").innerText = p.name || "—";
+          document.getElementById("headerSchool").innerText = (
+            p.schoolName || "—"
+          )
+            .split(" ")
+            .slice(0, 2)
+            .join(" ");
+          document.getElementById("profileName").innerText = p.name;
+          document.getElementById("profileSchool").innerText = p.schoolName;
+          document.getElementById("profileEmail").innerText = p.email;
+          document.getElementById("profileNucCode").innerText = p.nucCode;
+          document.getElementById("profileWallet").innerText =
+            currentAccount.slice(0, 8) + "..." + currentAccount.slice(-6);
+          const d = new Date(parseInt(p.registeredAt) * 1000);
+          document.getElementById("profileJoined").innerText =
+            d.toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            });
+          document.getElementById("profileDocHash").innerText = p.nucDocHash;
+        } catch (_) {
+          const c = JSON.parse(
+            localStorage.getItem("certifychain_admin") || "{}",
+          );
+          document.getElementById("profileName").innerText =
+            c.name || "System Owner";
+          document.getElementById("profileSchool").innerText =
+            c.school || "CertifyChain";
+          document.getElementById("headerName").innerText =
+            c.name || "System Owner";
+          document.getElementById("headerSchool").innerText = "System";
+          document.getElementById("profileDocHash").innerText = "N/A";
+        }
+      }
+
+      async function loadCurrentCode() {
+        try {
+          const code = await contract.methods
+            .getCurrentCode()
+            .call({ from: currentAccount });
+          document.getElementById("headerCode").innerText = code;
+        } catch (_) {
+          const c = JSON.parse(
+            localStorage.getItem("certifychain_admin") || "{}",
+          );
+          document.getElementById("headerCode").innerText = c.code || "—";
+        }
+      }
+
+      // ============================================================
+      //  Live new admin toast
+      // ============================================================
+      function listenForNewAdmins() {
+        contract.events
+          .AdminAdded({ fromBlock: "latest" })
+          .on("data", (event) => {
+            const { newAdmin, newAdminCode, schoolName } = event.returnValues;
+            if (newAdmin.toLowerCase() === currentAccount.toLowerCase()) return;
+            document.getElementById("headerCode").innerText = newAdminCode;
+            const area = document.getElementById("notificationArea");
+            const toast = document.createElement("div");
+            toast.className = "notify-toast";
+            toast.innerHTML = `
+          <div class="notify-title">🆕 New Admin Registered</div>
+          <div>${schoolName} joined CertifyChain.</div>
+          <div style="margin-top:6px;">Code: <span class="notify-code">${newAdminCode}</span></div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">${new Date().toLocaleTimeString()}</div>
+        `;
+            area.prepend(toast);
+            setTimeout(() => {
+              toast.style.transition = "opacity 0.5s";
+              toast.style.opacity = "0";
+              setTimeout(() => toast.remove(), 500);
+            }, 12000);
+          })
+          .on("error", console.warn);
+      }
+
+      // ============================================================
+      //  Revoke Certificate
+      // ============================================================
+      async function revokeCert() {
+        const certId = document.getElementById("revokeCertId").value.trim();
+        const confirmed = document.getElementById("confirmRevokeCheck").checked;
+        const msgEl = document.getElementById("revokeMsg");
+        if (!certId)
+          return (msgEl.innerHTML = `<span class="text-danger">❌ Please enter a Certificate ID.</span>`);
+        if (!confirmed)
+          return (msgEl.innerHTML = `<span class="text-danger">❌ Please tick the confirmation checkbox.</span>`);
+        const btn = document.getElementById("revokeBtn");
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> Revoking...`;
+        try {
+          await contract.methods
+            .revokeCertificate(certId)
+            .send({ from: currentAccount });
+          document.getElementById("revokeCertId").value = "";
+          document.getElementById("confirmRevokeCheck").checked = false;
+          msgEl.innerHTML = `<span class="text-danger">⚠️ Certificate <strong>${certId}</strong> permanently revoked.</span>`;
+          await loadLedger();
+        } catch (err) {
+          if (err.message.includes("does not exist"))
+            msgEl.innerHTML = `<span class="text-danger">❌ Certificate ID not found.</span>`;
+          else if (err.message.includes("already revoked"))
+            msgEl.innerHTML = `<span class="text-warning">⚠️ Already revoked.</span>`;
+          else if (err.code === 4001)
+            msgEl.innerHTML = `<span class="text-warning">❌ Cancelled in MetaMask.</span>`;
+          else
+            msgEl.innerHTML = `<span class="text-danger">❌ Transaction failed.</span>`;
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "🚫 Revoke Record";
+        }
+      }
+
+      // ============================================================
+      //  Load Ledger
+      // ============================================================
+      async function loadLedger() {
+        const tbody = document.getElementById("ledgerTableBody");
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-3 text-muted">
+      <span class="spinner"></span> Querying blockchain...</td></tr>`;
+        try {
+          const certs = await contract.methods
+            .getAllIssuedCertificates()
+            .call({ from: currentAccount });
+          if (!certs || certs.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">
+          No certificates issued yet.</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = "";
+          [...certs].reverse().forEach((cert) => {
+            const date = new Date(
+              parseInt(cert.timestamp) * 1000,
+            ).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            });
+            const badge = cert.isValid
+              ? `<span class="badge-valid">✅ Valid</span>`
+              : `<span class="badge-revoked">❌ Revoked</span>`;
+            tbody.innerHTML += `
+          <tr>
+            <td><code style="font-size:0.76rem">${cert.certificateID}</code></td>
+            <td>${cert.studentName}</td>
+            <td style="font-size:0.82rem">${cert.certificateType}</td>
+            <td>${cert.graduationDate}</td>
+            <td>${date}</td>
+            <td>${badge}</td>
+          </tr>`;
+          });
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">
+        Failed to load from blockchain.</td></tr>`;
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("certifychain_admin");
+        window.location.href = "role.html";
+      }
+    </script>
+  </body>
+</html>

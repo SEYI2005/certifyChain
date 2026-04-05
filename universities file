@@ -1,0 +1,372 @@
+{
+    "id": 95,
+    "name": "BOWEN UNIVERSITY, IWO",
+    "type": "Private",
+    "location": "Iwo, Osun State",
+    "established": null,
+    "accredited": true,
+    "canIssueCertificates": true,
+    "website": "https://bowen.edu.ng",
+    "programmes": [
+        {
+            "faculty": "ADMINISTRATION",
+            "name": "ACCOUNTING",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ADMINISTRATION",
+            "name": "BANKING AND FINANCE",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ADMINISTRATION",
+            "name": "BUSINESS ADMINISTRATION",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "ADMINISTRATION",
+            "name": "INDUSTRIAL RELATIONS AND PERSONNEL MANAGEMENT",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "AGRICULTURE",
+            "name": "AGRICULTURE (B.Agric.)",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2008-12-31",
+            "lastAccreditation": 2008
+        },
+        {
+            "faculty": "AGRICULTURE",
+            "name": "AGRIC. EXTENSION AND SOCIAL ENGINEERING (SAFE)",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "ARCHITECTURE",
+            "name": "ARCHITECTURE",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2026-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ARTS/LIBERAL STUDIES",
+            "name": "ICON ARTS",
+            "degreeLevel": "B.A",
+            "status": "Full",
+            "maturityDate": "2026-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ARTS/LIBERAL STUDIES",
+            "name": "ENGLISH LANGUAGE",
+            "degreeLevel": "B.A",
+            "status": "Full",
+            "maturityDate": "2026-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ARTS/LIBERAL STUDIES",
+            "name": "HISTORY AND INTERNATIONAL STUDIES",
+            "degreeLevel": "B.A",
+            "status": "Full",
+            "maturityDate": "2026-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ARTS/LIBERAL STUDIES",
+            "name": "RELIGIOUS STUDIES",
+            "degreeLevel": "B.A",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ARTS/LIBERAL STUDIES",
+            "name": "THEATRE ARTS",
+            "degreeLevel": "B.A",
+            "status": "Full",
+            "maturityDate": "2026-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ARTS/LIBERAL STUDIES",
+            "name": "MUSIC",
+            "degreeLevel": "B.A",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "ARTS/LIBERAL STUDIES",
+            "name": "PHILOSOPHY",
+            "degreeLevel": "B.A",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "ANATOMY",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "PHYSIOLOGY",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2024-12-31",
+            "lastAccreditation": 2024
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "MEDICINE AND SURGERY (MBBS)",
+            "degreeLevel": "MBBS",
+            "status": "Full",
+            "maturityDate": "2024-12-31",
+            "lastAccreditation": 2024
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "NURSING SCIENCE (B.NSc.)",
+            "degreeLevel": "B.NSc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "PHYSIOTHERAPY (B.Physiotherapy)",
+            "degreeLevel": "B.Physiotherapy",
+            "status": "Full",
+            "maturityDate": "2026-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "PUBLIC HEALTH",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "MEDICAL LABORATORY SCIENCE (BMLS)",
+            "degreeLevel": "BMLS",
+            "status": "Full",
+            "maturityDate": "2024-12-31",
+            "lastAccreditation": 2024
+        },
+        {
+            "faculty": "HEALTH SCIENCES",
+            "name": "NUTRITION AND DIETETICS",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "COMPUTING & COMMUNICATION",
+            "name": "COMPUTER SCIENCE",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "COMPUTING & COMMUNICATION",
+            "name": "INFORMATION TECHNOLOGY",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "COMPUTING & COMMUNICATION",
+            "name": "SOFTWARE ENGINEERING",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "COMPUTING & COMMUNICATION",
+            "name": "CYBER SECURITY",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "COMPUTING & COMMUNICATION",
+            "name": "MASS COMMUNICATION",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "COMPUTING & COMMUNICATION",
+            "name": "COMMUNICATION ARTS",
+            "degreeLevel": "B.A",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "ENGINEERING",
+            "name": "ELECTRICAL AND ELECTRONICS ENG",
+            "degreeLevel": "B.Eng",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ENGINEERING",
+            "name": "MECHANICAL ENGINEERING",
+            "degreeLevel": "B.Eng",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "ENGINEERING",
+            "name": "MECHATRONICS ENGINEERING",
+            "degreeLevel": "B.Eng",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "ENVIRONMENTAL SCIENCE",
+            "name": "SURVEYING AND GEO-INFORMATICS",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2025-12-31",
+            "lastAccreditation": 2024
+        },
+        {
+            "faculty": "LAW",
+            "name": "LAW (LL. B.)",
+            "degreeLevel": "LL. B.",
+            "status": "Full",
+            "maturityDate": "2024-12-31",
+            "lastAccreditation": 2024
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "BIOCHEMISTRY",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2028-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "INDUSTRIAL CHEMISTRY",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "MATHEMATICS",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "MICROBIOLOGY",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2028-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "FOOD SCIENCE AND TECHNOLOGY",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "PURE AND APPLIED BIOLOGY",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "STATISTICS",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "SCIENCE",
+            "name": "PHYSICS",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "SOCIAL SCIENCES",
+            "name": "ECONOMICS",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "SOCIAL SCIENCES",
+            "name": "POLITICAL SCIENCE",
+            "degreeLevel": "B.Sc",
+            "status": null,
+            "maturityDate": null,
+            "lastAccreditation": null
+        },
+        {
+            "faculty": "SOCIAL SCIENCES",
+            "name": "INTERNATIONAL RELATIONS",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        },
+        {
+            "faculty": "SOCIAL SCIENCES",
+            "name": "SOCIOLOGY",
+            "degreeLevel": "B.Sc",
+            "status": "Full",
+            "maturityDate": "2027-12-31",
+            "lastAccreditation": 2023
+        }
+    ]
+}

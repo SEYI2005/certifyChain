@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertifyChain — Verify Certificate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --navy: #0a0f1e;
+        --navy-card: #111827;
+        --gold: #c9a84c;
+        --gold-light: #e8c96d;
+        --white: #f5f7fa;
+        --muted: #8892a4;
+        --border: rgba(255, 255, 255, 0.07);
+        --success: #22c55e;
+        --danger: #ef4444;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        font-family: "Sora", sans-serif;
+        background-color: var(--navy);
+        color: var(--white);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+            ellipse 60% 50% at 80% 70%,
+            rgba(201, 168, 76, 0.04) 0%,
+            transparent 70%
+          ),
+          repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 40px,
+            rgba(255, 255, 255, 0.012) 40px,
+            rgba(255, 255, 255, 0.012) 41px
+          ),
+          repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 40px,
+            rgba(255, 255, 255, 0.012) 40px,
+            rgba(255, 255, 255, 0.012) 41px
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      /* ── Header ── */
+      header {
+        padding: 22px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .logo-text {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--white);
+      }
+      .logo-text span {
+        color: var(--gold);
+      }
+      .header-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        background: var(--navy-card);
+        border: 1px solid var(--border);
+        padding: 5px 12px;
+        border-radius: 20px;
+      }
+
+      /* ── Main ── */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 24px;
+      }
+
+      .eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        color: var(--gold);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        opacity: 0;
+        animation: fadeUp 0.5s ease 0.1s forwards;
+      }
+      .page-title {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 10px;
+        opacity: 0;
+        animation: fadeUp 0.5s ease 0.2s forwards;
+        text-align: center;
+      }
+      .page-sub {
+        font-size: 0.9rem;
+        color: var(--muted);
+        font-weight: 300;
+        margin-bottom: 40px;
+        text-align: center;
+        opacity: 0;
+        animation: fadeUp 0.5s ease 0.3s forwards;
+      }
+
+      /* ── Verify Card ── */
+      .verify-card {
+        background: var(--navy-card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 36px;
+        width: 100%;
+        max-width: 540px;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        animation: fadeUp 0.6s ease 0.4s forwards;
+      }
+      .verify-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold),
+          transparent
+        );
+      }
+
+      /* Input row */
+      .input-row {
+        display: flex;
+        gap: 10px;
+      }
+      .cert-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88rem;
+        color: var(--white);
+        letter-spacing: 0.02em;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+      .cert-input::placeholder {
+        color: var(--muted);
+      }
+      .cert-input:focus {
+        border-color: var(--gold);
+        background: rgba(201, 168, 76, 0.04);
+      }
+
+      .btn-verify {
+        padding: 14px 20px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        color: var(--navy);
+        font-family: "Sora", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-verify:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
+      }
+      .btn-verify:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Divider */
+      .or-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 18px 0;
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+      .or-divider::before,
+      .or-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* QR hint */
+      .qr-hint {
+        background: rgba(201, 168, 76, 0.06);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        border-radius: 10px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      .qr-hint-icon {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+      }
+      .qr-hint-text {
+        line-height: 1.5;
+      }
+      .qr-hint-text strong {
+        color: var(--gold);
+      }
+
+      /* Loading */
+      #loadingMsg {
+        display: none;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.78rem;
+        color: var(--gold);
+        margin-top: 20px;
+        letter-spacing: 0.05em;
+      }
+
+      /* Auto-verify banner */
+      .auto-verify-banner {
+        background: rgba(201, 168, 76, 0.1);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        font-size: 0.82rem;
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      /* ── Result Box ── */
+      #resultBox {
+        display: none;
+        margin-top: 24px;
+        border-radius: 14px;
+        padding: 24px;
+        border: 1px solid var(--border);
+        animation: fadeUp 0.4s ease forwards;
+      }
+      #resultBox.valid {
+        border-color: rgba(34, 197, 94, 0.4);
+        background: rgba(34, 197, 94, 0.06);
+      }
+      #resultBox.revoked {
+        border-color: rgba(239, 68, 68, 0.4);
+        background: rgba(239, 68, 68, 0.06);
+      }
+      #resultBox.invalid {
+        border-color: rgba(239, 68, 68, 0.3);
+        background: rgba(239, 68, 68, 0.04);
+      }
+
+      .result-banner {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .result-icon-big {
+        font-size: 2.2rem;
+      }
+      .result-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .result-title.valid {
+        color: var(--success);
+      }
+      .result-title.revoked {
+        color: var(--danger);
+      }
+      .result-title.invalid {
+        color: var(--danger);
+      }
+      .result-subtitle {
+        font-size: 0.78rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+
+      /* Detail grid */
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .detail-label {
+        font-size: 0.64rem;
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+      .detail-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--white);
+      }
+
+      /* Proof row */
+      .proof-row {
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.72rem;
+        color: var(--muted);
+        font-family: "JetBrains Mono", monospace;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .proof-badge {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.25);
+        color: var(--success);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.68rem;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+      }
+
+      /* How it works */
+      .how-section {
+        margin-top: 36px;
+        display: flex;
+        gap: 16px;
+        max-width: 540px;
+        width: 100%;
+        opacity: 0;
+        animation: fadeUp 0.6s ease 0.55s forwards;
+      }
+      .how-step {
+        flex: 1;
+        background: var(--navy-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+      }
+      .how-icon {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+      }
+      .how-label {
+        font-size: 0.74rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* Footer */
+      footer {
+        padding: 18px 40px;
+        border-top: 1px solid var(--border);
+        font-size: 0.74rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      /* Spinner */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        width: 15px;
+        height: 15px;
+        border: 2px solid var(--navy);
+        border-top-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        animation: spin 0.7s linear infinite;
+      }
+      .spinner-gold {
+        width: 15px;
+        height: 15px;
+        border: 2px solid var(--gold);
+        border-top-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        animation: spin 0.7s linear infinite;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 520px) {
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+        .how-section {
+          flex-direction: column;
+        }
+        header {
+          padding: 18px 20px;
+        }
+        .verify-card {
+          padding: 24px 16px;
+        }
+        .input-row {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <a href="role.html" class="logo">
+          <div class="logo-icon">⛓</div>
+          <div class="logo-text">Certify<span>Chain</span></div>
+        </a>
+        <div class="header-tag">PUBLIC VERIFICATION PORTAL</div>
+      </header>
+
+      <main>
+        <p class="eyebrow">Blockchain-Powered · Instant · Trustless</p>
+        <h1 class="page-title">Verify a Certificate</h1>
+        <p class="page-sub">
+          Scan the QR code on the certificate or enter the Certificate ID
+          manually.
+        </p>
+
+        <div class="verify-card">
+          <!-- Auto-verify banner — shown when page is opened via QR scan -->
+          <div
+            class="auto-verify-banner"
+            id="autoVerifyBanner"
+            style="display: none"
+          >
+            <span class="spinner-gold"></span>
+            <span>QR code detected — verifying automatically...</span>
+          </div>
+
+          <!-- Manual input -->
+          <div class="input-row">
+            <input
+              type="text"
+              id="verifyId"
+              class="cert-input"
+              placeholder="e.g. BOWEN-CS-2026-4194"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button
+              class="btn-verify"
+              id="verifyBtn"
+              onclick="triggerVerification()"
+            >
+              <span id="btnContent">🔍 Verify</span>
+            </button>
+          </div>
+
+          <div class="or-divider">or scan the QR code on the certificate</div>
+
+          <!-- QR hint -->
+          <div class="qr-hint">
+            <div class="qr-hint-icon">📷</div>
+            <div class="qr-hint-text">
+              <strong>QR Code Scan:</strong> Use your phone camera or a QR
+              scanner app to scan the QR code on the certificate. It will open
+              this page and verify instantly.
+            </div>
+          </div>
+
+          <!-- Loading indicator -->
+          <div id="loadingMsg">⛓ Querying Ethereum blockchain...</div>
+
+          <!-- ── Result Box ── -->
+          <div id="resultBox">
+            <div class="result-banner">
+              <div class="result-icon-big" id="resultIcon"></div>
+              <div>
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-subtitle" id="resultSubtitle"></div>
+              </div>
+            </div>
+
+            <div class="detail-grid" id="detailGrid">
+              <div class="detail-item">
+                <span class="detail-label">Student Name</span>
+                <span class="detail-value" id="v-name">—</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Certificate ID</span>
+                <span
+                  class="detail-value"
+                  id="v-certid"
+                  style="
+                    font-family: 'JetBrains Mono', monospace;
+                    font-size: 0.78rem;
+                  "
+                  >—</span
+                >
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Programme</span>
+                <span class="detail-value" id="v-type">—</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Class of</span>
+                <span class="detail-value" id="v-date">—</span>
+              </div>
+              <div class="detail-item" style="grid-column: 1 / -1">
+                <span class="detail-label">Institution</span>
+                <span class="detail-value" id="v-school">—</span>
+              </div>
+            </div>
+
+            <div class="proof-row" id="proofRow">
+              <span id="proofText"></span>
+              <span class="proof-badge" id="proofBadge"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="how-section">
+          <div class="how-step">
+            <div class="how-icon">📷</div>
+            <div class="how-label">
+              Scan the QR code on the certificate with any camera or QR app
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-icon">🆔</div>
+            <div class="how-label">
+              Or type the Certificate ID printed at the bottom of the document
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-icon">⛓</div>
+            <div class="how-label">
+              Result comes directly from the Ethereum blockchain — instant and
+              tamper-proof
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        © 2026 CertifyChain · Bowen University, Iwo ·
+        <span style="font-family: 'JetBrains Mono', monospace"
+          >No login required · Free to verify</span
+        >
+      </footer>
+    </div>
+
+    <script>
+      // ============================================================
+      //  CONTRACT CONFIG — update this after every redeployment
+      // ============================================================
+      const CONTRACT_ADDRESS = "0xD01DeE3c241DdbfE94C62CBeCf8fFB2060764383";
+
+      const CONTRACT_ABI = [
+        {
+          inputs: [
+            { internalType: "string", name: "_certificateID", type: "string" },
+          ],
+          name: "verifyCertificate",
+          outputs: [
+            { internalType: "string", name: "studentName", type: "string" },
+            { internalType: "string", name: "certificateType", type: "string" },
+            { internalType: "string", name: "school", type: "string" },
+            { internalType: "string", name: "graduationDate", type: "string" },
+            { internalType: "bool", name: "isValid", type: "bool" },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      // ============================================================
+      //  WEB3 + CONTRACT INITIALISATION
+      //  Read-only connection — no MetaMask needed for public verification.
+      //  The node must be running at http://127.0.0.1:8545
+      // ============================================================
+      const web3 = new Web3(
+        "https://eth-sepolia.g.alchemy.com/v2/kpCCErcVYQBBT7cM_66E8",
+      );
+      const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+
+      // ============================================================
+      //  ON PAGE LOAD
+      //  Checks if page was opened via QR code scan.
+      //  QR codes encode a URL like:
+      //    http://localhost:3000/verify.html?id=BOWEN-CS-2026-4194
+      //  If the ?id= parameter exists, auto-fill and verify instantly.
+      // ============================================================
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const scannedID = urlParams.get("id");
+
+        if (scannedID) {
+          // Show the auto-verify banner so user knows QR was detected
+          document.getElementById("autoVerifyBanner").style.display = "flex";
+
+          // Fill the input so user can see the ID
+          document.getElementById("verifyId").value = scannedID;
+
+          // Short delay so banner is visible before result appears
+          setTimeout(() => triggerVerification(), 800);
+        }
+      };
+
+      // ============================================================
+      //  Enter key support — press Enter to verify
+      // ============================================================
+      document.getElementById("verifyId").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") triggerVerification();
+      });
+
+      // ============================================================
+      //  TRIGGER VERIFICATION
+      //  Called by: Verify button, Enter key, and QR auto-verify
+      // ============================================================
+      function triggerVerification() {
+        const id = document.getElementById("verifyId").value.trim();
+
+        if (!id) {
+          // Shake the input border red to indicate error
+          const input = document.getElementById("verifyId");
+          input.style.borderColor = "var(--danger)";
+          setTimeout(() => {
+            input.style.borderColor = "";
+          }, 1500);
+          return;
+        }
+
+        // Reset previous result
+        const resultBox = document.getElementById("resultBox");
+        resultBox.style.display = "none";
+        resultBox.className = "";
+        document.getElementById("autoVerifyBanner").style.display = "none";
+
+        // Show loading state on button
+        const btn = document.getElementById("verifyBtn");
+        btn.disabled = true;
+        document.getElementById(
+          "btnContent",
+        ).innerHTML = `<span class="spinner"></span>`;
+        document.getElementById("loadingMsg").style.display = "block";
+
+        // Call the blockchain
+        processVerification(id);
+      }
+
+      // ============================================================
+      //  CALL SMART CONTRACT — verifyCertificate(id)
+      //  This is a view function — costs zero gas and needs no wallet
+      // ============================================================
+      async function processVerification(id) {
+        const loadingMsg = document.getElementById("loadingMsg");
+        const btn = document.getElementById("verifyBtn");
+
+        try {
+          const result = await contract.methods.verifyCertificate(id).call();
+
+          // Hide loading, restore button
+          loadingMsg.style.display = "none";
+          btn.disabled = false;
+          document.getElementById("btnContent").innerHTML = "🔍 Verify";
+
+          if (result.isValid === true) {
+            // ── VALID CERTIFICATE ──
+            document.getElementById("v-name").innerText = result.studentName;
+            document.getElementById("v-certid").innerText = id;
+            document.getElementById("v-type").innerText =
+              result.certificateType;
+            document.getElementById("v-school").innerText = result.school;
+            document.getElementById("v-date").innerText = result.graduationDate;
+
+            document.getElementById("detailGrid").style.display = "grid";
+            document.getElementById("proofRow").style.display = "flex";
+            document.getElementById(
+              "proofText",
+            ).innerText = `Verified on Ethereum blockchain · ${new Date().toLocaleString()}`;
+            document.getElementById("proofBadge").innerText = "✓ AUTHENTIC";
+
+            showResult(
+              "valid",
+              "✅",
+              "AUTHENTIC CERTIFICATE",
+              "Cryptographically verified on the Ethereum blockchain.",
+            );
+          } else {
+            // ── REVOKED CERTIFICATE ──
+            document.getElementById("detailGrid").style.display = "none";
+            document.getElementById("proofRow").style.display = "none";
+
+            showResult(
+              "revoked",
+              "🚫",
+              "CERTIFICATE REVOKED",
+              "This certificate has been formally revoked by the issuing institution.",
+            );
+          }
+        } catch (err) {
+          // Contract reverted — certificate not found on blockchain
+          loadingMsg.style.display = "none";
+          btn.disabled = false;
+          document.getElementById("btnContent").innerHTML = "🔍 Verify";
+          console.error("Verification error:", err);
+
+          document.getElementById("detailGrid").style.display = "none";
+          document.getElementById("proofRow").style.display = "none";
+
+          showResult(
+            "invalid",
+            "⚠️",
+            "NOT FOUND ON BLOCKCHAIN",
+            "This ID does not exist on the ledger. The certificate may be forged or the ID is incorrect.",
+          );
+        }
+      }
+
+      // ============================================================
+      //  UPDATE RESULT BOX UI
+      // ============================================================
+      function showResult(type, icon, title, subtitle) {
+        const box = document.getElementById("resultBox");
+        box.className = type;
+        box.style.display = "block";
+
+        document.getElementById("resultIcon").innerText = icon;
+        document.getElementById("resultTitle").innerText = title;
+        document.getElementById(
+          "resultTitle",
+        ).className = `result-title ${type}`;
+        document.getElementById("resultSubtitle").innerText = subtitle;
+
+        box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    </script>
+  </body>
+</html>
