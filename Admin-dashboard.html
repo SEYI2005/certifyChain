@@ -14,6 +14,7 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <!-- QRCode.js kept as fallback only — primary QR is Google Charts API -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -118,13 +119,8 @@
         animation: pulse 2s infinite;
       }
       @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.4;
-        }
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
       }
 
       /* ── Toasts ── */
@@ -149,14 +145,8 @@
         color: var(--white);
       }
       @keyframes slideIn {
-        from {
-          transform: translateX(120%);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
+        from { transform: translateX(120%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
       }
       .notify-title {
         font-weight: 700;
@@ -355,9 +345,7 @@
         flex-direction: column;
         gap: 4px;
       }
-      .detail-row:last-child {
-        border-bottom: none;
-      }
+      .detail-row:last-child { border-bottom: none; }
       .detail-field {
         font-family: "JetBrains Mono", monospace;
         font-size: 0.62rem;
@@ -426,16 +414,9 @@
         animation: fadeUp 0.5s ease forwards;
       }
       @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-
       .qr-success-header {
         background: #16a34a;
         color: #fff;
@@ -446,14 +427,11 @@
         font-weight: 700;
         font-size: 0.95rem;
       }
-
       .qr-success-body {
         display: grid;
         grid-template-columns: auto 1fr;
         gap: 0;
       }
-
-      /* QR code display area */
       .qr-code-area {
         padding: 24px;
         display: flex;
@@ -472,10 +450,10 @@
         letter-spacing: 0.08em;
       }
       #qrcode-container {
-        /* QRCode.js renders inside here */
         display: flex;
         align-items: center;
         justify-content: center;
+        min-height: 180px;
       }
       #qrcode-container canvas,
       #qrcode-container img {
@@ -488,8 +466,6 @@
         text-align: center;
         line-height: 1.5;
       }
-
-      /* Certificate details area */
       .cert-details-area {
         padding: 24px;
         display: flex;
@@ -538,8 +514,6 @@
         font-weight: 600;
         color: #1a1a2e;
       }
-
-      /* Action buttons row */
       .qr-actions {
         display: flex;
         gap: 10px;
@@ -580,11 +554,7 @@
         align-items: center;
         gap: 6px;
       }
-      .btn-copy-id:hover {
-        background: #f0fdf4;
-      }
-
-      /* Verify URL display */
+      .btn-copy-id:hover { background: #f0fdf4; }
       .verify-url-box {
         background: #f8f9fa;
         border: 1px solid #e9ecef;
@@ -612,14 +582,12 @@
         font-weight: 600;
         color: #555;
       }
-      .form-control,
-      .form-select {
+      .form-control, .form-select {
         font-family: "Sora", sans-serif;
         font-size: 0.88rem;
         border-color: #e2e8f0;
       }
-      .form-control:focus,
-      .form-select:focus {
+      .form-control:focus, .form-select:focus {
         border-color: #003d82;
         box-shadow: none;
       }
@@ -655,11 +623,7 @@
       }
 
       /* Spinner */
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
+      @keyframes spin { to { transform: rotate(360deg); } }
       .spinner {
         width: 14px;
         height: 14px;
@@ -680,29 +644,15 @@
       }
 
       @media (max-width: 768px) {
-        .preview-layout {
-          grid-template-columns: 1fr;
-        }
-        .doc-viewer {
-          border-right: none;
-          border-bottom: 1px solid #e2e8f0;
-        }
-        .qr-success-body {
-          grid-template-columns: 1fr;
-        }
-        .qr-code-area {
-          border-right: none;
-          border-bottom: 1px solid #bbf7d0;
-        }
-        .profile-card {
-          grid-template-columns: auto 1fr;
-        }
-        .profile-card > div:last-child {
-          display: none;
-        }
-        .cert-meta-grid {
-          grid-template-columns: 1fr;
-        }
+        .preview-layout { grid-template-columns: 1fr; }
+        .doc-viewer { border-right: none; border-bottom: 1px solid #e2e8f0; }
+        .qr-success-body { grid-template-columns: 1fr; }
+        .qr-code-area { border-right: none; border-bottom: 1px solid #bbf7d0; }
+        .profile-card { grid-template-columns: auto 1fr; }
+        .profile-card > div:last-child { display: none; }
+        .cert-meta-grid { grid-template-columns: 1fr; }
+        .admin-info-panel { gap: 8px; }
+        .admin-chip { padding: 4px 8px; }
       }
     </style>
   </head>
@@ -714,14 +664,7 @@
         <div class="logo-icon">⛓</div>
         <div>
           <div class="header-title">Certify<span>Chain</span></div>
-          <div
-            style="
-              font-size: 0.6rem;
-              opacity: 0.6;
-              font-family: 'JetBrains Mono', monospace;
-              letter-spacing: 0.08em;
-            "
-          >
+          <div style="font-size:0.6rem;opacity:0.6;font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;">
             ADMIN DASHBOARD
           </div>
         </div>
@@ -740,23 +683,19 @@
           <span class="chip-value" id="headerCode">Loading...</span>
         </div>
         <div class="pulse-dot"></div>
-        <button
-          class="btn btn-sm btn-light"
-          onclick="logout()"
-          style="font-family: 'Sora', sans-serif; font-size: 0.8rem"
-        >
+        <button class="btn btn-sm btn-light" onclick="logout()"
+          style="font-family:'Sora',sans-serif;font-size:0.8rem;">
           Logout
         </button>
       </div>
     </header>
 
     <main>
+      <!-- Profile Card -->
       <div class="profile-card">
         <div class="profile-avatar">🏫</div>
         <div>
-          <div class="profile-name" id="profileName">
-            Loading profile from blockchain...
-          </div>
+          <div class="profile-name" id="profileName">Loading profile from blockchain...</div>
           <div class="profile-school" id="profileSchool"></div>
           <div class="profile-meta">
             <div class="meta-item">
@@ -778,25 +717,18 @@
           </div>
         </div>
         <div>
-          <div class="meta-label" style="margin-bottom: 6px">
-            NUC Document Hash (on-chain)
-          </div>
+          <div class="meta-label" style="margin-bottom:6px;">NUC Document Hash (on-chain)</div>
           <div class="doc-hash" id="profileDocHash">Loading...</div>
         </div>
       </div>
 
+      <!-- Issue Certificate -->
       <section>
         <div class="section-head">
           <div class="section-title">
-            📄 <span style="color: #1d4ed8">Issue New Certificate</span>
+            📄 <span style="color:#1d4ed8;">Issue New Certificate</span>
           </div>
-          <span
-            style="
-              font-size: 0.72rem;
-              color: #999;
-              font-family: 'JetBrains Mono', monospace;
-            "
-          >
+          <span style="font-size:0.72rem;color:#999;font-family:'JetBrains Mono',monospace;">
             Programme-validated · Manually verified · QR auto-generated
           </span>
         </div>
@@ -804,51 +736,25 @@
         <div class="row">
           <div class="col-md-6">
             <label class="form-label">Upload Certificate Document</label>
-            <input
-              type="file"
-              id="certFile"
-              class="form-control mb-2"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onchange="onFileSelected()"
-            />
+            <input type="file" id="certFile" class="form-control mb-2"
+              accept=".pdf,.jpg,.jpeg,.png" onchange="onFileSelected()" />
 
-            <div
-              id="duplicateDocWarning"
-              style="display: none; margin-bottom: 12px"
-            >
-              <div
-                style="
-                  background: #fef2f2;
-                  border: 1px solid #fca5a5;
-                  border-radius: 8px;
-                  padding: 12px 14px;
-                  font-size: 0.82rem;
-                  color: #991b1b;
-                  line-height: 1.6;
-                "
-              >
+            <div id="duplicateDocWarning" style="display:none;margin-bottom:12px;">
+              <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;
+                          padding:12px 14px;font-size:0.82rem;color:#991b1b;line-height:1.6;">
                 ⚠️ <strong>Duplicate Document Detected</strong><br />
-                This file has already been issued as a certificate on the
-                blockchain. The same document cannot be used for two different
-                certificates. Please upload the correct original document for
-                this student.
+                This file has already been issued as a certificate on the blockchain.
+                The same document cannot be used for two different certificates.
+                Please upload the correct original document for this student.
               </div>
             </div>
 
             <label class="form-label">Student Full Name</label>
-            <input
-              type="text"
-              id="studentName"
-              class="form-control mb-3"
-              placeholder="e.g. Oluwaseyifunmi Alonge"
-            />
+            <input type="text" id="studentName" class="form-control mb-3"
+              placeholder="e.g. Oluwaseyifunmi Alonge" />
 
             <label class="form-label">Programme</label>
-            <select
-              id="certType"
-              class="form-select mb-1"
-              onchange="onProgrammeChange()"
-            >
+            <select id="certType" class="form-select mb-1" onchange="onProgrammeChange()">
               <option value="">Select Programme...</option>
             </select>
             <div id="programmeStatus"></div>
@@ -856,50 +762,34 @@
 
           <div class="col-md-6">
             <label class="form-label">Institution</label>
-            <input
-              type="text"
-              id="school"
-              class="form-control mb-3"
-              value="Bowen University"
-              readonly
-            />
+            <input type="text" id="school" class="form-control mb-3"
+              value="Bowen University" readonly />
 
             <label class="form-label">Graduation Year</label>
-            <input
-              type="number"
-              id="gradDate"
-              class="form-control mb-3"
-              placeholder="e.g. 2026"
-              min="1980"
-              max="2100"
-            />
+            <input type="number" id="gradDate" class="form-control mb-3"
+              placeholder="e.g. 2026" min="1980" max="2100" />
 
             <label class="form-label">Degree Classification</label>
             <select id="degreeClass" class="form-select mb-4">
               <option value="">Select Classification...</option>
               <option value="First Class Honours">First Class Honours</option>
-              <option value="Second Class Upper Honours">
-                Second Class Upper Honours
-              </option>
-              <option value="Second Class Lower Honours">
-                Second Class Lower Honours
-              </option>
+              <option value="Second Class Upper Honours">Second Class Upper Honours</option>
+              <option value="Second Class Lower Honours">Second Class Lower Honours</option>
               <option value="Third Class Honours">Third Class Honours</option>
               <option value="Pass">Pass</option>
               <option value="Distinction">Distinction</option>
               <option value="Merit">Merit</option>
             </select>
 
-            <button
-              class="btn btn-outline-primary w-100"
+            <button class="btn btn-outline-primary w-100" id="previewBtn"
               onclick="showPreviewPanel()"
-              style="font-family: 'Sora', sans-serif; font-weight: 600"
-            >
+              style="font-family:'Sora',sans-serif;font-weight:600;">
               👁 Preview & Verify Details
             </button>
           </div>
         </div>
 
+        <!-- Document Preview Panel -->
         <div class="doc-preview-panel" id="docPreviewPanel">
           <div class="doc-preview-header">
             📋 Manual Verification — Compare document with entered details
@@ -908,9 +798,7 @@
             <div class="doc-viewer">
               <div class="doc-viewer-label">📄 Uploaded Certificate</div>
               <div id="docPreviewContent">
-                <span class="text-muted" style="font-size: 0.85rem"
-                  >No file loaded</span
-                >
+                <span class="text-muted" style="font-size:0.85rem;">No file loaded</span>
               </div>
             </div>
             <div class="doc-details">
@@ -918,23 +806,17 @@
               <div class="detail-row">
                 <span class="detail-field">Student Name</span>
                 <span class="detail-value" id="preview-name">—</span>
-                <span class="detail-hint"
-                  >Check the name matches exactly as on the document</span
-                >
+                <span class="detail-hint">Check the name matches exactly as on the document</span>
               </div>
               <div class="detail-row">
                 <span class="detail-field">Programme</span>
                 <span class="detail-value" id="preview-programme">—</span>
-                <span class="detail-hint"
-                  >Check the degree and programme name</span
-                >
+                <span class="detail-hint">Check the degree and programme name</span>
               </div>
               <div class="detail-row">
                 <span class="detail-field">Degree Classification</span>
                 <span class="detail-value" id="preview-class">—</span>
-                <span class="detail-hint"
-                  >Check the class of degree stated</span
-                >
+                <span class="detail-hint">Check the class of degree stated</span>
               </div>
               <div class="detail-row">
                 <span class="detail-field">Graduation Year</span>
@@ -951,96 +833,57 @@
 
           <div class="confirmation-area">
             <div class="confirm-instruction">
-              <strong
-                >Tick each box after verifying against the document on the
-                left:</strong
-              >
+              <strong>Tick each box after verifying against the document on the left:</strong>
             </div>
             <div class="confirm-checklist">
               <label class="confirm-check">
-                <input
-                  type="checkbox"
-                  id="check1"
-                  onchange="checkAllConfirmed()"
-                />
+                <input type="checkbox" id="check1" onchange="checkAllConfirmed()" />
                 The student name matches what I entered
               </label>
               <label class="confirm-check">
-                <input
-                  type="checkbox"
-                  id="check2"
-                  onchange="checkAllConfirmed()"
-                />
+                <input type="checkbox" id="check2" onchange="checkAllConfirmed()" />
                 The programme and degree level match what I selected
               </label>
               <label class="confirm-check">
-                <input
-                  type="checkbox"
-                  id="check3"
-                  onchange="checkAllConfirmed()"
-                />
+                <input type="checkbox" id="check3" onchange="checkAllConfirmed()" />
                 The graduation year matches what I entered
               </label>
               <label class="confirm-check">
-                <input
-                  type="checkbox"
-                  id="check4"
-                  onchange="checkAllConfirmed()"
-                />
+                <input type="checkbox" id="check4" onchange="checkAllConfirmed()" />
                 The degree classification matches what I selected
               </label>
               <label class="confirm-check">
-                <input
-                  type="checkbox"
-                  id="check5"
-                  onchange="checkAllConfirmed()"
-                />
+                <input type="checkbox" id="check5" onchange="checkAllConfirmed()" />
                 This certificate is genuine and was issued by Bowen University
               </label>
             </div>
-            <button
-              class="btn btn-success w-100 py-2"
-              id="issueBtn"
-              onclick="issueCert()"
-            >
+            <button class="btn btn-success w-100 py-2" id="issueBtn" onclick="issueCert()">
               ⛓ All Verified — Issue to Blockchain
             </button>
-            <div
-              style="
-                font-size: 0.72rem;
-                color: #888;
-                text-align: center;
-                margin-top: 8px;
-              "
-            >
-              All boxes must be ticked. This action is permanent and cannot be
-              undone.
+            <div style="font-size:0.72rem;color:#888;text-align:center;margin-top:8px;">
+              All boxes must be ticked. This action is permanent and cannot be undone.
             </div>
           </div>
         </div>
 
+        <!-- QR Success Section -->
         <div class="qr-success-section" id="qrSuccessSection">
           <div class="qr-success-header">
             ✅ Certificate Issued to Blockchain — QR Code Generated
           </div>
-
           <div class="qr-success-body">
             <div class="qr-code-area">
               <div class="qr-label">Scan to Verify</div>
-
               <div id="qrcode-container"></div>
-
               <div class="qr-scan-hint">
                 Employer or student scans this<br />with any camera or QR app
               </div>
             </div>
-
             <div class="cert-details-area">
               <div>
                 <div class="cert-id-label">Certificate ID</div>
                 <div class="cert-id-display" id="displayCertId">—</div>
               </div>
-
               <div class="cert-meta-grid">
                 <div class="cert-meta-item">
                   <span class="cert-meta-label">Student</span>
@@ -1050,19 +893,15 @@
                   <span class="cert-meta-label">Year</span>
                   <span class="cert-meta-value" id="issued-year">—</span>
                 </div>
-                <div class="cert-meta-item" style="grid-column: 1 / -1">
+                <div class="cert-meta-item" style="grid-column:1/-1;">
                   <span class="cert-meta-label">Programme</span>
                   <span class="cert-meta-value" id="issued-prog">—</span>
                 </div>
               </div>
-
               <div>
-                <div class="verify-url-label">
-                  Verification URL (encoded in QR)
-                </div>
+                <div class="verify-url-label">Verification URL (encoded in QR)</div>
                 <div class="verify-url-box" id="verifyUrlDisplay">—</div>
               </div>
-
               <div class="qr-actions">
                 <button class="btn-download-qr" onclick="downloadQR()">
                   ⬇ Download QR Code
@@ -1071,59 +910,37 @@
                   📋 Copy Certificate ID
                 </button>
               </div>
-
-              <div
-                style="
-                  font-size: 0.72rem;
-                  color: #888;
-                  line-height: 1.5;
-                  margin-top: 4px;
-                "
-              >
-                The QR code and Certificate ID both link to the same
-                verification page. Share either one with the certificate holder.
+              <div style="font-size:0.72rem;color:#888;line-height:1.5;margin-top:4px;">
+                The QR code and Certificate ID both link to the same verification page.
+                Share either one with the certificate holder.
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- Revoke -->
       <section>
         <div class="section-head">
           <div class="section-title">
-            🚫 <span style="color: #dc2626">Revoke Certificate</span>
+            🚫 <span style="color:#dc2626;">Revoke Certificate</span>
           </div>
         </div>
         <div class="row align-items-start">
           <div class="col-md-8">
-            <input
-              type="text"
-              id="revokeCertId"
-              class="form-control mb-2"
-              placeholder="Enter Certificate ID — e.g. BOWEN-CS-2026-1234"
-            />
+            <input type="text" id="revokeCertId" class="form-control mb-2"
+              placeholder="Enter Certificate ID — e.g. BOWEN-CS-2026-1234" />
             <div class="form-check mb-3">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="confirmRevokeCheck"
-              />
-              <label
-                class="form-check-label text-danger"
-                for="confirmRevokeCheck"
-              >
-                I confirm this certificate should be permanently revoked on the
-                blockchain.
+              <input class="form-check-input" type="checkbox" id="confirmRevokeCheck" />
+              <label class="form-check-label text-danger" for="confirmRevokeCheck">
+                I confirm this certificate should be permanently revoked on the blockchain.
               </label>
             </div>
           </div>
           <div class="col-md-4">
-            <button
-              class="btn btn-outline-danger w-100"
-              id="revokeBtn"
+            <button class="btn btn-outline-danger w-100" id="revokeBtn"
               onclick="revokeCert()"
-              style="font-family: 'Sora', sans-serif; font-weight: 600"
-            >
+              style="font-family:'Sora',sans-serif;font-weight:600;">
               🚫 Revoke Record
             </button>
           </div>
@@ -1131,16 +948,12 @@
         <div id="revokeMsg" class="mt-2 fw-semibold"></div>
       </section>
 
+      <!-- Ledger -->
       <section>
         <div class="section-head">
-          <div class="section-title">
-            📋 Blockchain Ledger — All Issued Certificates
-          </div>
-          <button
-            class="btn btn-outline-secondary btn-sm"
-            onclick="loadLedger()"
-            style="font-family: 'Sora', sans-serif; font-size: 0.8rem"
-          >
+          <div class="section-title">📋 Blockchain Ledger — All Issued Certificates</div>
+          <button class="btn btn-outline-secondary btn-sm" onclick="loadLedger()"
+            style="font-family:'Sora',sans-serif;font-size:0.8rem;">
             🔄 Refresh
           </button>
         </div>
@@ -1170,15 +983,13 @@
 
     <script>
       // ============================================================
-      //  CONTRACT CONFIG — update after each redeployment
+      //  CONTRACT CONFIG
       // ============================================================
       const CONTRACT_ADDRESS = "0xD01DeE3c241DdbfE94C62CBeCf8fFB2060764383";
 
       const CONTRACT_ABI = [
         {
-          inputs: [
-            { internalType: "address", name: "_admin", type: "address" },
-          ],
+          inputs: [{ internalType: "address", name: "_admin", type: "address" }],
           name: "getAdminProfile",
           outputs: [
             { internalType: "string", name: "name", type: "string" },
@@ -1203,18 +1014,10 @@
           inputs: [
             { internalType: "string", name: "_certificateID", type: "string" },
             { internalType: "string", name: "_studentName", type: "string" },
-            {
-              internalType: "string",
-              name: "_certificateType",
-              type: "string",
-            },
+            { internalType: "string", name: "_certificateType", type: "string" },
             { internalType: "string", name: "_school", type: "string" },
             { internalType: "string", name: "_graduationDate", type: "string" },
-            {
-              internalType: "string",
-              name: "_certificateHash",
-              type: "string",
-            },
+            { internalType: "string", name: "_certificateHash", type: "string" },
           ],
           name: "issueCertificate",
           outputs: [],
@@ -1222,23 +1025,14 @@
           type: "function",
         },
         {
-          inputs: [
-            { internalType: "string", name: "_certificateID", type: "string" },
-          ],
+          inputs: [{ internalType: "string", name: "_certificateID", type: "string" }],
           name: "revokeCertificate",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
-          // Duplicate document check — called on file select before MetaMask fires
-          inputs: [
-            {
-              internalType: "string",
-              name: "_certificateHash",
-              type: "string",
-            },
-          ],
+          inputs: [{ internalType: "string", name: "_certificateHash", type: "string" }],
           name: "isDocumentAlreadyIssued",
           outputs: [{ internalType: "bool", name: "", type: "bool" }],
           stateMutability: "view",
@@ -1247,70 +1041,32 @@
         {
           inputs: [],
           name: "getAllIssuedCertificates",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "string",
-                  name: "certificateID",
-                  type: "string",
-                },
-                { internalType: "string", name: "studentName", type: "string" },
-                {
-                  internalType: "string",
-                  name: "certificateType",
-                  type: "string",
-                },
-                { internalType: "string", name: "school", type: "string" },
-                {
-                  internalType: "string",
-                  name: "graduationDate",
-                  type: "string",
-                },
-                {
-                  internalType: "string",
-                  name: "certificateHash",
-                  type: "string",
-                },
-                { internalType: "uint256", name: "timestamp", type: "uint256" },
-                { internalType: "bool", name: "isValid", type: "bool" },
-                { internalType: "bool", name: "isIssued", type: "bool" },
-              ],
-              internalType: "struct CertifyChain.Certificate[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
+          outputs: [{
+            components: [
+              { internalType: "string", name: "certificateID", type: "string" },
+              { internalType: "string", name: "studentName", type: "string" },
+              { internalType: "string", name: "certificateType", type: "string" },
+              { internalType: "string", name: "school", type: "string" },
+              { internalType: "string", name: "graduationDate", type: "string" },
+              { internalType: "string", name: "certificateHash", type: "string" },
+              { internalType: "uint256", name: "timestamp", type: "uint256" },
+              { internalType: "bool", name: "isValid", type: "bool" },
+              { internalType: "bool", name: "isIssued", type: "bool" },
+            ],
+            internalType: "struct CertifyChain.Certificate[]",
+            name: "",
+            type: "tuple[]",
+          }],
           stateMutability: "view",
           type: "function",
         },
         {
           anonymous: false,
           inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newAdmin",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "string",
-              name: "newAdminCode",
-              type: "string",
-            },
-            {
-              indexed: false,
-              internalType: "string",
-              name: "schoolName",
-              type: "string",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "timestamp",
-              type: "uint256",
-            },
+            { indexed: true, internalType: "address", name: "newAdmin", type: "address" },
+            { indexed: false, internalType: "string", name: "newAdminCode", type: "string" },
+            { indexed: false, internalType: "string", name: "schoolName", type: "string" },
+            { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
           ],
           name: "AdminAdded",
           type: "event",
@@ -1318,274 +1074,54 @@
       ];
 
       // ============================================================
-      //  BOWEN PROGRAMMES (from universities_file)
+      //  BOWEN PROGRAMMES
       // ============================================================
       const BOWEN_PROGRAMMES = [
-        {
-          name: "ACCOUNTING",
-          degreeLevel: "B.Sc",
-          faculty: "ADMINISTRATION",
-          status: "Full",
-        },
-        {
-          name: "BANKING AND FINANCE",
-          degreeLevel: "B.Sc",
-          faculty: "ADMINISTRATION",
-          status: "Full",
-        },
-        {
-          name: "BUSINESS ADMINISTRATION",
-          degreeLevel: "B.Sc",
-          faculty: "ADMINISTRATION",
-          status: null,
-        },
-        {
-          name: "INDUSTRIAL RELATIONS AND PERSONNEL MANAGEMENT",
-          degreeLevel: "B.Sc",
-          faculty: "ADMINISTRATION",
-          status: "Full",
-        },
-        {
-          name: "AGRICULTURE",
-          degreeLevel: "B.Sc",
-          faculty: "AGRICULTURE",
-          status: "Full",
-        },
-        {
-          name: "AGRIC. EXTENSION AND SOCIAL ENGINEERING",
-          degreeLevel: "B.Sc",
-          faculty: "AGRICULTURE",
-          status: null,
-        },
-        {
-          name: "ARCHITECTURE",
-          degreeLevel: "B.Sc",
-          faculty: "ARCHITECTURE",
-          status: "Full",
-        },
-        {
-          name: "ICON ARTS",
-          degreeLevel: "B.A",
-          faculty: "ARTS/LIBERAL STUDIES",
-          status: "Full",
-        },
-        {
-          name: "ENGLISH LANGUAGE",
-          degreeLevel: "B.A",
-          faculty: "ARTS/LIBERAL STUDIES",
-          status: "Full",
-        },
-        {
-          name: "HISTORY AND INTERNATIONAL STUDIES",
-          degreeLevel: "B.A",
-          faculty: "ARTS/LIBERAL STUDIES",
-          status: "Full",
-        },
-        {
-          name: "RELIGIOUS STUDIES",
-          degreeLevel: "B.A",
-          faculty: "ARTS/LIBERAL STUDIES",
-          status: "Full",
-        },
-        {
-          name: "THEATRE ARTS",
-          degreeLevel: "B.A",
-          faculty: "ARTS/LIBERAL STUDIES",
-          status: "Full",
-        },
-        {
-          name: "MUSIC",
-          degreeLevel: "B.A",
-          faculty: "ARTS/LIBERAL STUDIES",
-          status: null,
-        },
-        {
-          name: "PHILOSOPHY",
-          degreeLevel: "B.A",
-          faculty: "ARTS/LIBERAL STUDIES",
-          status: null,
-        },
-        {
-          name: "ANATOMY",
-          degreeLevel: "B.Sc",
-          faculty: "HEALTH SCIENCES",
-          status: null,
-        },
-        {
-          name: "PHYSIOLOGY",
-          degreeLevel: "B.Sc",
-          faculty: "HEALTH SCIENCES",
-          status: "Full",
-        },
-        {
-          name: "MEDICINE AND SURGERY",
-          degreeLevel: "MBBS",
-          faculty: "HEALTH SCIENCES",
-          status: "Full",
-        },
-        {
-          name: "NURSING SCIENCE",
-          degreeLevel: "B.NSc",
-          faculty: "HEALTH SCIENCES",
-          status: null,
-        },
-        {
-          name: "PHYSIOTHERAPY",
-          degreeLevel: "B.Physiotherapy",
-          faculty: "HEALTH SCIENCES",
-          status: "Full",
-        },
-        {
-          name: "PUBLIC HEALTH",
-          degreeLevel: "B.Sc",
-          faculty: "HEALTH SCIENCES",
-          status: null,
-        },
-        {
-          name: "MEDICAL LABORATORY SCIENCE",
-          degreeLevel: "BMLS",
-          faculty: "HEALTH SCIENCES",
-          status: "Full",
-        },
-        {
-          name: "NUTRITION AND DIETETICS",
-          degreeLevel: "B.Sc",
-          faculty: "HEALTH SCIENCES",
-          status: null,
-        },
-        {
-          name: "COMPUTER SCIENCE",
-          degreeLevel: "B.Sc",
-          faculty: "COMPUTING & COMMUNICATION",
-          status: "Full",
-        },
-        {
-          name: "INFORMATION TECHNOLOGY",
-          degreeLevel: "B.Sc",
-          faculty: "COMPUTING & COMMUNICATION",
-          status: "Full",
-        },
-        {
-          name: "SOFTWARE ENGINEERING",
-          degreeLevel: "B.Sc",
-          faculty: "COMPUTING & COMMUNICATION",
-          status: "Full",
-        },
-        {
-          name: "CYBER SECURITY",
-          degreeLevel: "B.Sc",
-          faculty: "COMPUTING & COMMUNICATION",
-          status: null,
-        },
-        {
-          name: "MASS COMMUNICATION",
-          degreeLevel: "B.Sc",
-          faculty: "COMPUTING & COMMUNICATION",
-          status: "Full",
-        },
-        {
-          name: "COMMUNICATION ARTS",
-          degreeLevel: "B.A",
-          faculty: "COMPUTING & COMMUNICATION",
-          status: null,
-        },
-        {
-          name: "ELECTRICAL AND ELECTRONICS ENGINEERING",
-          degreeLevel: "B.Eng",
-          faculty: "ENGINEERING",
-          status: "Full",
-        },
-        {
-          name: "MECHANICAL ENGINEERING",
-          degreeLevel: "B.Eng",
-          faculty: "ENGINEERING",
-          status: "Full",
-        },
-        {
-          name: "MECHATRONICS ENGINEERING",
-          degreeLevel: "B.Eng",
-          faculty: "ENGINEERING",
-          status: null,
-        },
-        {
-          name: "SURVEYING AND GEO-INFORMATICS",
-          degreeLevel: "B.Sc",
-          faculty: "ENVIRONMENTAL SCIENCE",
-          status: "Full",
-        },
+        { name: "ACCOUNTING", degreeLevel: "B.Sc", faculty: "ADMINISTRATION", status: "Full" },
+        { name: "BANKING AND FINANCE", degreeLevel: "B.Sc", faculty: "ADMINISTRATION", status: "Full" },
+        { name: "BUSINESS ADMINISTRATION", degreeLevel: "B.Sc", faculty: "ADMINISTRATION", status: null },
+        { name: "INDUSTRIAL RELATIONS AND PERSONNEL MANAGEMENT", degreeLevel: "B.Sc", faculty: "ADMINISTRATION", status: "Full" },
+        { name: "AGRICULTURE", degreeLevel: "B.Sc", faculty: "AGRICULTURE", status: "Full" },
+        { name: "AGRIC. EXTENSION AND SOCIAL ENGINEERING", degreeLevel: "B.Sc", faculty: "AGRICULTURE", status: null },
+        { name: "ARCHITECTURE", degreeLevel: "B.Sc", faculty: "ARCHITECTURE", status: "Full" },
+        { name: "ICON ARTS", degreeLevel: "B.A", faculty: "ARTS/LIBERAL STUDIES", status: "Full" },
+        { name: "ENGLISH LANGUAGE", degreeLevel: "B.A", faculty: "ARTS/LIBERAL STUDIES", status: "Full" },
+        { name: "HISTORY AND INTERNATIONAL STUDIES", degreeLevel: "B.A", faculty: "ARTS/LIBERAL STUDIES", status: "Full" },
+        { name: "RELIGIOUS STUDIES", degreeLevel: "B.A", faculty: "ARTS/LIBERAL STUDIES", status: "Full" },
+        { name: "THEATRE ARTS", degreeLevel: "B.A", faculty: "ARTS/LIBERAL STUDIES", status: "Full" },
+        { name: "MUSIC", degreeLevel: "B.A", faculty: "ARTS/LIBERAL STUDIES", status: null },
+        { name: "PHILOSOPHY", degreeLevel: "B.A", faculty: "ARTS/LIBERAL STUDIES", status: null },
+        { name: "ANATOMY", degreeLevel: "B.Sc", faculty: "HEALTH SCIENCES", status: null },
+        { name: "PHYSIOLOGY", degreeLevel: "B.Sc", faculty: "HEALTH SCIENCES", status: "Full" },
+        { name: "MEDICINE AND SURGERY", degreeLevel: "MBBS", faculty: "HEALTH SCIENCES", status: "Full" },
+        { name: "NURSING SCIENCE", degreeLevel: "B.NSc", faculty: "HEALTH SCIENCES", status: null },
+        { name: "PHYSIOTHERAPY", degreeLevel: "B.Physiotherapy", faculty: "HEALTH SCIENCES", status: "Full" },
+        { name: "PUBLIC HEALTH", degreeLevel: "B.Sc", faculty: "HEALTH SCIENCES", status: null },
+        { name: "MEDICAL LABORATORY SCIENCE", degreeLevel: "BMLS", faculty: "HEALTH SCIENCES", status: "Full" },
+        { name: "NUTRITION AND DIETETICS", degreeLevel: "B.Sc", faculty: "HEALTH SCIENCES", status: null },
+        { name: "COMPUTER SCIENCE", degreeLevel: "B.Sc", faculty: "COMPUTING & COMMUNICATION", status: "Full" },
+        { name: "INFORMATION TECHNOLOGY", degreeLevel: "B.Sc", faculty: "COMPUTING & COMMUNICATION", status: "Full" },
+        { name: "SOFTWARE ENGINEERING", degreeLevel: "B.Sc", faculty: "COMPUTING & COMMUNICATION", status: "Full" },
+        { name: "CYBER SECURITY", degreeLevel: "B.Sc", faculty: "COMPUTING & COMMUNICATION", status: null },
+        { name: "MASS COMMUNICATION", degreeLevel: "B.Sc", faculty: "COMPUTING & COMMUNICATION", status: "Full" },
+        { name: "COMMUNICATION ARTS", degreeLevel: "B.A", faculty: "COMPUTING & COMMUNICATION", status: null },
+        { name: "ELECTRICAL AND ELECTRONICS ENGINEERING", degreeLevel: "B.Eng", faculty: "ENGINEERING", status: "Full" },
+        { name: "MECHANICAL ENGINEERING", degreeLevel: "B.Eng", faculty: "ENGINEERING", status: "Full" },
+        { name: "MECHATRONICS ENGINEERING", degreeLevel: "B.Eng", faculty: "ENGINEERING", status: null },
+        { name: "SURVEYING AND GEO-INFORMATICS", degreeLevel: "B.Sc", faculty: "ENVIRONMENTAL SCIENCE", status: "Full" },
         { name: "LAW", degreeLevel: "LL. B.", faculty: "LAW", status: "Full" },
-        {
-          name: "BIOCHEMISTRY",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: "Full",
-        },
-        {
-          name: "INDUSTRIAL CHEMISTRY",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: "Full",
-        },
-        {
-          name: "MATHEMATICS",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: "Full",
-        },
-        {
-          name: "MICROBIOLOGY",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: "Full",
-        },
-        {
-          name: "FOOD SCIENCE AND TECHNOLOGY",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: "Full",
-        },
-        {
-          name: "PURE AND APPLIED BIOLOGY",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: null,
-        },
-        {
-          name: "STATISTICS",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: null,
-        },
-        {
-          name: "PHYSICS",
-          degreeLevel: "B.Sc",
-          faculty: "SCIENCE",
-          status: null,
-        },
-        {
-          name: "ECONOMICS",
-          degreeLevel: "B.Sc",
-          faculty: "SOCIAL SCIENCES",
-          status: null,
-        },
-        {
-          name: "POLITICAL SCIENCE",
-          degreeLevel: "B.Sc",
-          faculty: "SOCIAL SCIENCES",
-          status: null,
-        },
-        {
-          name: "INTERNATIONAL RELATIONS",
-          degreeLevel: "B.Sc",
-          faculty: "SOCIAL SCIENCES",
-          status: "Full",
-        },
-        {
-          name: "SOCIOLOGY",
-          degreeLevel: "B.Sc",
-          faculty: "SOCIAL SCIENCES",
-          status: "Full",
-        },
+        { name: "BIOCHEMISTRY", degreeLevel: "B.Sc", faculty: "SCIENCE", status: "Full" },
+        { name: "INDUSTRIAL CHEMISTRY", degreeLevel: "B.Sc", faculty: "SCIENCE", status: "Full" },
+        { name: "MATHEMATICS", degreeLevel: "B.Sc", faculty: "SCIENCE", status: "Full" },
+        { name: "MICROBIOLOGY", degreeLevel: "B.Sc", faculty: "SCIENCE", status: "Full" },
+        { name: "FOOD SCIENCE AND TECHNOLOGY", degreeLevel: "B.Sc", faculty: "SCIENCE", status: "Full" },
+        { name: "PURE AND APPLIED BIOLOGY", degreeLevel: "B.Sc", faculty: "SCIENCE", status: null },
+        { name: "STATISTICS", degreeLevel: "B.Sc", faculty: "SCIENCE", status: null },
+        { name: "PHYSICS", degreeLevel: "B.Sc", faculty: "SCIENCE", status: null },
+        { name: "ECONOMICS", degreeLevel: "B.Sc", faculty: "SOCIAL SCIENCES", status: null },
+        { name: "POLITICAL SCIENCE", degreeLevel: "B.Sc", faculty: "SOCIAL SCIENCES", status: null },
+        { name: "INTERNATIONAL RELATIONS", degreeLevel: "B.Sc", faculty: "SOCIAL SCIENCES", status: "Full" },
+        { name: "SOCIOLOGY", degreeLevel: "B.Sc", faculty: "SOCIAL SCIENCES", status: "Full" },
       ];
 
       // ============================================================
@@ -1593,7 +1129,7 @@
       // ============================================================
       let web3, contract, currentAccount;
 
-      // The verification base URL — what gets embedded in the QR code
+      // ── Update this to your Vercel URL ──
       const BASE_VERIFY_URL =
         "https://certify-chain-zooz-lu8716i9m-seyis-projects-09f5a70b.vercel.app/verify.html";
 
@@ -1609,18 +1145,11 @@
         try {
           web3 = new Web3(window.ethereum);
           const accounts = await web3.eth.getAccounts();
-          if (!accounts.length) {
-            window.location.href = "role.html";
-            return;
-          }
+          if (!accounts.length) { window.location.href = "role.html"; return; }
           currentAccount = accounts[0];
           contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
           populateProgrammeDropdown();
-          await Promise.all([
-            loadAdminProfile(),
-            loadCurrentCode(),
-            loadLedger(),
-          ]);
+          await Promise.all([loadAdminProfile(), loadCurrentCode(), loadLedger()]);
           listenForNewAdmins();
         } catch (err) {
           console.error("Dashboard init:", err);
@@ -1628,7 +1157,7 @@
       });
 
       // ============================================================
-      //  Populate programme dropdown
+      //  Programme dropdown
       // ============================================================
       function populateProgrammeDropdown() {
         const sel = document.getElementById("certType");
@@ -1637,90 +1166,77 @@
           if (!byFaculty[p.faculty]) byFaculty[p.faculty] = [];
           byFaculty[p.faculty].push(p);
         });
-        Object.keys(byFaculty)
-          .sort()
-          .forEach((faculty) => {
-            const group = document.createElement("optgroup");
-            group.label = faculty;
-            byFaculty[faculty].forEach((p) => {
-              const opt = document.createElement("option");
-              opt.value = `${p.degreeLevel}|${p.name}`;
-              opt.textContent = `${p.degreeLevel} — ${p.name}`;
-              if (!p.status) opt.style.color = "#999";
-              group.appendChild(opt);
-            });
-            sel.appendChild(group);
+        Object.keys(byFaculty).sort().forEach((faculty) => {
+          const group = document.createElement("optgroup");
+          group.label = faculty;
+          byFaculty[faculty].forEach((p) => {
+            const opt = document.createElement("option");
+            opt.value = `${p.degreeLevel}|${p.name}`;
+            opt.textContent = `${p.degreeLevel} — ${p.name}`;
+            if (!p.status) opt.style.color = "#999";
+            group.appendChild(opt);
           });
+          sel.appendChild(group);
+        });
       }
 
       function onProgrammeChange() {
         const val = document.getElementById("certType").value;
         const status = document.getElementById("programmeStatus");
-        if (!val) {
-          status.innerHTML = "";
-          return;
-        }
+        if (!val) { status.innerHTML = ""; return; }
         const [degree, name] = val.split("|");
-        const prog = BOWEN_PROGRAMMES.find(
-          (p) => p.name === name && p.degreeLevel === degree,
-        );
+        const prog = BOWEN_PROGRAMMES.find((p) => p.name === name && p.degreeLevel === degree);
         if (prog?.status === "Full") {
           status.innerHTML = `<span style="color:#16a34a;font-size:0.72rem;">✓ Fully accredited — ${prog.faculty}</span>`;
         } else if (prog) {
           status.innerHTML = `<span style="color:#d97706;font-size:0.72rem;">⚠ Accreditation pending — ${prog.faculty}</span>`;
         }
-        if (
-          document.getElementById("docPreviewPanel").style.display !== "none"
-        ) {
+        if (document.getElementById("docPreviewPanel").style.display !== "none") {
           updatePreviewDetails();
         }
       }
 
+      // ============================================================
+      //  File selected — preview + duplicate check
+      // ============================================================
       async function onFileSelected() {
         const file = document.getElementById("certFile").files[0];
         const preview = document.getElementById("docPreviewContent");
         if (!file) return;
 
-        // Render document preview
         if (preview._objectURL) URL.revokeObjectURL(preview._objectURL);
         const url = URL.createObjectURL(file);
         preview._objectURL = url;
+
         if (file.type === "application/pdf") {
           preview.innerHTML = `<iframe src="${url}"></iframe>`;
         } else if (file.type.startsWith("image/")) {
           preview.innerHTML = `<img src="${url}" alt="Certificate preview" />`;
         } else {
           preview.innerHTML = `<div class="text-center text-muted" style="padding:40px;">
-        <div style="font-size:2rem;margin-bottom:8px;">📎</div>
-        <div style="font-size:0.85rem;">${file.name}</div>
-      </div>`;
+            <div style="font-size:2rem;margin-bottom:8px;">📎</div>
+            <div style="font-size:0.85rem;">${file.name}</div>
+          </div>`;
         }
         resetConfirmation();
 
-        // ── Duplicate document check ──
         if (!contract) return;
-
         try {
           const buffer = await file.arrayBuffer();
           const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
           const certHash = Array.from(new Uint8Array(hashBuffer))
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-
+            .map((b) => b.toString(16).padStart(2, "0")).join("");
           file._sha256 = certHash;
 
           const alreadyIssued = await contract.methods
-            .isDocumentAlreadyIssued(certHash)
-            .call();
+            .isDocumentAlreadyIssued(certHash).call();
 
           if (alreadyIssued) {
-            const warning = document.getElementById("duplicateDocWarning");
-            warning.style.display = "block";
+            document.getElementById("duplicateDocWarning").style.display = "block";
             document.getElementById("previewBtn").disabled = true;
             document.getElementById("previewBtn").style.opacity = "0.5";
           } else {
-            document.getElementById("duplicateDocWarning").style.display =
-              "none";
+            document.getElementById("duplicateDocWarning").style.display = "none";
             document.getElementById("previewBtn").disabled = false;
             document.getElementById("previewBtn").style.opacity = "1";
           }
@@ -1735,8 +1251,7 @@
         const certType = document.getElementById("certType").value;
         const year = document.getElementById("gradDate").value.trim();
         const cls = document.getElementById("degreeClass").value;
-        if (!file)
-          return alert("❌ Please upload the certificate document first.");
+        if (!file) return alert("❌ Please upload the certificate document first.");
         if (!name) return alert("❌ Please enter the student's full name.");
         if (!certType) return alert("❌ Please select a programme.");
         if (!year) return alert("❌ Please enter the graduation year.");
@@ -1753,9 +1268,8 @@
         const [degree, name] = certType ? certType.split("|") : ["—", "—"];
         document.getElementById("preview-name").innerText =
           document.getElementById("studentName").value.trim() || "—";
-        document.getElementById("preview-programme").innerText = certType
-          ? `${degree} — ${name}`
-          : "—";
+        document.getElementById("preview-programme").innerText =
+          certType ? `${degree} — ${name}` : "—";
         document.getElementById("preview-class").innerText =
           document.getElementById("degreeClass").value || "—";
         document.getElementById("preview-year").innerText =
@@ -1763,20 +1277,15 @@
       }
 
       function checkAllConfirmed() {
-        const allChecked = [
-          "check1",
-          "check2",
-          "check3",
-          "check4",
-          "check5",
-        ].every((id) => document.getElementById(id).checked);
+        const allChecked = ["check1","check2","check3","check4","check5"]
+          .every((id) => document.getElementById(id).checked);
         const btn = document.getElementById("issueBtn");
         btn.style.display = "block";
         btn.disabled = !allChecked;
       }
 
       function resetConfirmation() {
-        ["check1", "check2", "check3", "check4", "check5"].forEach((id) => {
+        ["check1","check2","check3","check4","check5"].forEach((id) => {
           document.getElementById(id).checked = false;
         });
         const btn = document.getElementById("issueBtn");
@@ -1793,7 +1302,6 @@
         const certType = document.getElementById("certType").value;
         const year = document.getElementById("gradDate").value.trim();
         const cls = document.getElementById("degreeClass").value;
-
         const [degree, progName] = certType.split("|");
         const fullProg = `${degree} ${progName} (${cls})`;
 
@@ -1805,20 +1313,12 @@
           const buffer = await file.arrayBuffer();
           const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
           const certHash = Array.from(new Uint8Array(hashBuffer))
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
+            .map((b) => b.toString(16).padStart(2, "0")).join("");
 
           const certId = generateCertID(progName, year);
 
           await contract.methods
-            .issueCertificate(
-              certId,
-              name,
-              fullProg,
-              "Bowen University",
-              year,
-              certHash,
-            )
+            .issueCertificate(certId, name, fullProg, "Bowen University", year, certHash)
             .send({ from: currentAccount });
 
           generateAndShowQR(certId, name, fullProg, year);
@@ -1837,23 +1337,60 @@
       }
 
       // ============================================================
-      //  Generate QR Code
+      //  GENERATE QR CODE
+      //  Primary: Google Charts API — plain <img>, works on ALL
+      //  browsers including MetaMask mobile (no canvas needed).
+      //  Fallback 1: QRCode.js canvas
+      //  Fallback 2: text placeholder
       // ============================================================
       function generateAndShowQR(certId, name, programme, year) {
         const verifyURL = `${BASE_VERIFY_URL}?id=${certId}`;
-
         const container = document.getElementById("qrcode-container");
         container.innerHTML = "";
 
-        new QRCode(container, {
-          text: verifyURL,
-          width: 180,
-          height: 180,
-          colorDark: "#003d82",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H,
-        });
+        // ── PRIMARY: Google Charts API ──
+        const qrImg = document.createElement("img");
+        qrImg.src = `https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=${encodeURIComponent(verifyURL)}&choe=UTF-8&chld=H|1`;
+        qrImg.alt = "Certificate QR Code";
+        qrImg.width = 180;
+        qrImg.height = 180;
+        qrImg.style.borderRadius = "8px";
+        qrImg.style.boxShadow = "0 4px 14px rgba(0,0,0,0.12)";
 
+        // ── FALLBACK: QRCode.js canvas if Google Charts fails ──
+        qrImg.onerror = () => {
+          container.innerHTML = "";
+          try {
+            new QRCode(container, {
+              text: verifyURL,
+              width: 180,
+              height: 180,
+              colorDark: "#003d82",
+              colorLight: "#ffffff",
+              correctLevel: QRCode.CorrectLevel.H,
+            });
+          } catch (e) {
+            // Last resort — show placeholder with instructions
+            container.innerHTML = `
+              <div style="
+                width:180px;height:180px;
+                background:#f0fdf4;
+                border:2px dashed #86efac;
+                border-radius:8px;
+                display:flex;align-items:center;
+                justify-content:center;
+                font-size:0.75rem;color:#166534;
+                text-align:center;padding:12px;
+              ">
+                📋 Use the Certificate ID or URL below to verify
+              </div>
+            `;
+          }
+        };
+
+        container.appendChild(qrImg);
+
+        // Fill in the certificate details
         document.getElementById("displayCertId").innerText = certId;
         document.getElementById("issued-name").innerText = name;
         document.getElementById("issued-prog").innerText = programme;
@@ -1865,24 +1402,34 @@
         section.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
+      // ============================================================
+      //  DOWNLOAD QR
+      // ============================================================
       function downloadQR() {
-        const canvas = document.querySelector("#qrcode-container canvas");
-        const img = document.querySelector("#qrcode-container img");
         const certId = document.getElementById("displayCertId").innerText;
 
+        // Try canvas first (QRCode.js fallback)
+        const canvas = document.querySelector("#qrcode-container canvas");
         if (canvas) {
           const a = document.createElement("a");
           a.download = `${certId}-QR.png`;
           a.href = canvas.toDataURL("image/png");
           a.click();
-        } else if (img) {
+          return;
+        }
+
+        // Google Charts img
+        const img = document.querySelector("#qrcode-container img");
+        if (img) {
           const a = document.createElement("a");
           a.download = `${certId}-QR.png`;
           a.href = img.src;
+          a.target = "_blank";
           a.click();
-        } else {
-          alert("QR code not found. Please issue a certificate first.");
+          return;
         }
+
+        alert("QR code not found. Please issue a certificate first.");
       }
 
       function copyCertId() {
@@ -1891,44 +1438,26 @@
           const btn = document.querySelector(".btn-copy-id");
           const original = btn.innerHTML;
           btn.innerHTML = "✅ Copied!";
-          setTimeout(() => {
-            btn.innerHTML = original;
-          }, 2000);
+          setTimeout(() => { btn.innerHTML = original; }, 2000);
         });
       }
 
+      // ============================================================
+      //  Generate Certificate ID
+      // ============================================================
       function generateCertID(progName, year) {
         const map = {
-          "COMPUTER SCIENCE": "CS",
-          "SOFTWARE ENGINEERING": "SE",
-          "INFORMATION TECHNOLOGY": "IT",
-          "CYBER SECURITY": "CY",
-          "ELECTRICAL AND ELECTRONICS": "EE",
-          "MECHANICAL ENGINEERING": "ME",
-          MECHATRONICS: "MCH",
-          ACCOUNTING: "ACC",
-          "BANKING AND FINANCE": "BF",
-          "MEDICINE AND SURGERY": "MB",
-          "NURSING SCIENCE": "NS",
-          LAW: "LW",
-          BIOCHEMISTRY: "BC",
-          MATHEMATICS: "MAT",
-          "MASS COMMUNICATION": "MC",
-          ARCHITECTURE: "ARC",
-          MICROBIOLOGY: "MIB",
-          ECONOMICS: "ECO",
-          "INTERNATIONAL RELATIONS": "IR",
-          SOCIOLOGY: "SOC",
-          PHYSIOLOGY: "PHY",
-          PHYSICS: "PHY2",
-          STATISTICS: "STA",
-          "ENGLISH LANGUAGE": "ENG",
-          SURVEYING: "SVG",
-          AGRICULTURE: "AGR",
-          "MEDICAL LABORATORY": "MLS",
-          PHYSIOTHERAPY: "PT",
-          "PUBLIC HEALTH": "PH",
-          NUTRITION: "ND",
+          "COMPUTER SCIENCE": "CS", "SOFTWARE ENGINEERING": "SE",
+          "INFORMATION TECHNOLOGY": "IT", "CYBER SECURITY": "CY",
+          "ELECTRICAL AND ELECTRONICS": "EE", "MECHANICAL ENGINEERING": "ME",
+          "MECHATRONICS": "MCH", "ACCOUNTING": "ACC", "BANKING AND FINANCE": "BF",
+          "MEDICINE AND SURGERY": "MB", "NURSING SCIENCE": "NS", "LAW": "LW",
+          "BIOCHEMISTRY": "BC", "MATHEMATICS": "MAT", "MASS COMMUNICATION": "MC",
+          "ARCHITECTURE": "ARC", "MICROBIOLOGY": "MIB", "ECONOMICS": "ECO",
+          "INTERNATIONAL RELATIONS": "IR", "SOCIOLOGY": "SOC", "PHYSIOLOGY": "PHY",
+          "PHYSICS": "PHY2", "STATISTICS": "STA", "ENGLISH LANGUAGE": "ENG",
+          "SURVEYING": "SVG", "AGRICULTURE": "AGR", "MEDICAL LABORATORY": "MLS",
+          "PHYSIOTHERAPY": "PT", "PUBLIC HEALTH": "PH", "NUTRITION": "ND",
         };
         const upper = progName.toUpperCase();
         const code = Object.keys(map).find((k) => upper.includes(k));
@@ -1942,15 +1471,10 @@
       async function loadAdminProfile() {
         try {
           const p = await contract.methods
-            .getAdminProfile(currentAccount)
-            .call({ from: currentAccount });
+            .getAdminProfile(currentAccount).call({ from: currentAccount });
           document.getElementById("headerName").innerText = p.name || "—";
-          document.getElementById("headerSchool").innerText = (
-            p.schoolName || "—"
-          )
-            .split(" ")
-            .slice(0, 2)
-            .join(" ");
+          document.getElementById("headerSchool").innerText =
+            (p.schoolName || "—").split(" ").slice(0, 2).join(" ");
           document.getElementById("profileName").innerText = p.name;
           document.getElementById("profileSchool").innerText = p.schoolName;
           document.getElementById("profileEmail").innerText = p.email;
@@ -1959,22 +1483,13 @@
             currentAccount.slice(0, 8) + "..." + currentAccount.slice(-6);
           const d = new Date(parseInt(p.registeredAt) * 1000);
           document.getElementById("profileJoined").innerText =
-            d.toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            });
+            d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
           document.getElementById("profileDocHash").innerText = p.nucDocHash;
         } catch (_) {
-          const c = JSON.parse(
-            localStorage.getItem("certifychain_admin") || "{}",
-          );
-          document.getElementById("profileName").innerText =
-            c.name || "System Owner";
-          document.getElementById("profileSchool").innerText =
-            c.school || "CertifyChain";
-          document.getElementById("headerName").innerText =
-            c.name || "System Owner";
+          const c = JSON.parse(localStorage.getItem("certifychain_admin") || "{}");
+          document.getElementById("profileName").innerText = c.name || "System Owner";
+          document.getElementById("profileSchool").innerText = c.school || "CertifyChain";
+          document.getElementById("headerName").innerText = c.name || "System Owner";
           document.getElementById("headerSchool").innerText = "System";
           document.getElementById("profileDocHash").innerText = "N/A";
         }
@@ -1983,13 +1498,10 @@
       async function loadCurrentCode() {
         try {
           const code = await contract.methods
-            .getCurrentCode()
-            .call({ from: currentAccount });
+            .getCurrentCode().call({ from: currentAccount });
           document.getElementById("headerCode").innerText = code;
         } catch (_) {
-          const c = JSON.parse(
-            localStorage.getItem("certifychain_admin") || "{}",
-          );
+          const c = JSON.parse(localStorage.getItem("certifychain_admin") || "{}");
           document.getElementById("headerCode").innerText = c.code || "—";
         }
       }
@@ -1998,8 +1510,7 @@
       //  Live new admin toast
       // ============================================================
       function listenForNewAdmins() {
-        contract.events
-          .AdminAdded({ fromBlock: "latest" })
+        contract.events.AdminAdded({ fromBlock: "latest" })
           .on("data", (event) => {
             const { newAdmin, newAdminCode, schoolName } = event.returnValues;
             if (newAdmin.toLowerCase() === currentAccount.toLowerCase()) return;
@@ -2008,19 +1519,18 @@
             const toast = document.createElement("div");
             toast.className = "notify-toast";
             toast.innerHTML = `
-          <div class="notify-title">🆕 New Admin Registered</div>
-          <div>${schoolName} joined CertifyChain.</div>
-          <div style="margin-top:6px;">Code: <span class="notify-code">${newAdminCode}</span></div>
-          <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">${new Date().toLocaleTimeString()}</div>
-        `;
+              <div class="notify-title">🆕 New Admin Registered</div>
+              <div>${schoolName} joined CertifyChain.</div>
+              <div style="margin-top:6px;">Code: <span class="notify-code">${newAdminCode}</span></div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">${new Date().toLocaleTimeString()}</div>
+            `;
             area.prepend(toast);
             setTimeout(() => {
               toast.style.transition = "opacity 0.5s";
               toast.style.opacity = "0";
               setTimeout(() => toast.remove(), 500);
             }, 12000);
-          })
-          .on("error", console.warn);
+          }).on("error", console.warn);
       }
 
       // ============================================================
@@ -2030,17 +1540,13 @@
         const certId = document.getElementById("revokeCertId").value.trim();
         const confirmed = document.getElementById("confirmRevokeCheck").checked;
         const msgEl = document.getElementById("revokeMsg");
-        if (!certId)
-          return (msgEl.innerHTML = `<span class="text-danger">❌ Please enter a Certificate ID.</span>`);
-        if (!confirmed)
-          return (msgEl.innerHTML = `<span class="text-danger">❌ Please tick the confirmation checkbox.</span>`);
+        if (!certId) return (msgEl.innerHTML = `<span class="text-danger">❌ Please enter a Certificate ID.</span>`);
+        if (!confirmed) return (msgEl.innerHTML = `<span class="text-danger">❌ Please tick the confirmation checkbox.</span>`);
         const btn = document.getElementById("revokeBtn");
         btn.disabled = true;
         btn.innerHTML = `<span class="spinner"></span> Revoking...`;
         try {
-          await contract.methods
-            .revokeCertificate(certId)
-            .send({ from: currentAccount });
+          await contract.methods.revokeCertificate(certId).send({ from: currentAccount });
           document.getElementById("revokeCertId").value = "";
           document.getElementById("confirmRevokeCheck").checked = false;
           msgEl.innerHTML = `<span class="text-danger">⚠️ Certificate <strong>${certId}</strong> permanently revoked.</span>`;
@@ -2066,41 +1572,35 @@
       async function loadLedger() {
         const tbody = document.getElementById("ledgerTableBody");
         tbody.innerHTML = `<tr><td colspan="6" class="text-center py-3 text-muted">
-      <span class="spinner"></span> Querying blockchain...</td></tr>`;
+          <span class="spinner"></span> Querying blockchain...</td></tr>`;
         try {
           const certs = await contract.methods
-            .getAllIssuedCertificates()
-            .call({ from: currentAccount });
+            .getAllIssuedCertificates().call({ from: currentAccount });
           if (!certs || certs.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">
-          No certificates issued yet.</td></tr>`;
+              No certificates issued yet.</td></tr>`;
             return;
           }
           tbody.innerHTML = "";
           [...certs].reverse().forEach((cert) => {
-            const date = new Date(
-              parseInt(cert.timestamp) * 1000,
-            ).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            });
+            const date = new Date(parseInt(cert.timestamp) * 1000)
+              .toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
             const badge = cert.isValid
               ? `<span class="badge-valid">✅ Valid</span>`
               : `<span class="badge-revoked">❌ Revoked</span>`;
             tbody.innerHTML += `
-          <tr>
-            <td><code style="font-size:0.76rem">${cert.certificateID}</code></td>
-            <td>${cert.studentName}</td>
-            <td style="font-size:0.82rem">${cert.certificateType}</td>
-            <td>${cert.graduationDate}</td>
-            <td>${date}</td>
-            <td>${badge}</td>
-          </tr>`;
+              <tr>
+                <td><code style="font-size:0.76rem">${cert.certificateID}</code></td>
+                <td>${cert.studentName}</td>
+                <td style="font-size:0.82rem">${cert.certificateType}</td>
+                <td>${cert.graduationDate}</td>
+                <td>${date}</td>
+                <td>${badge}</td>
+              </tr>`;
           });
         } catch (err) {
           tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">
-        Failed to load from blockchain.</td></tr>`;
+            Failed to load from blockchain.</td></tr>`;
         }
       }
 
