@@ -1588,9 +1588,8 @@
       // ============================================================
       let web3, contract, currentAccount;
 
-      // ── Update this to your Vercel URL ──
-      const BASE_VERIFY_URL =
-        "https://certify-chain-zooz-lu8716i9m-seyis-projects-09f5a70b.vercel.app/verify.html";
+      // Build verify URL from the current deployment to avoid stale preview links.
+      const BASE_VERIFY_URL = new URL("verify.html", window.location.href).href;
 
       // ============================================================
       //  INIT
