@@ -666,6 +666,35 @@ let web3;
 let contract;
 let userAccount;
 
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
+    navigator.userAgent,
+  );
+}
+
+function openMetaMaskMobileDapp() {
+  return new Promise((resolve) => {
+    const dappUrl = encodeURIComponent(window.location.href);
+    const deepLink = `https://metamask.app.link/dapp/${dappUrl}`;
+
+    let didBackground = false;
+    const onHidden = () => {
+      didBackground = true;
+    };
+
+    document.addEventListener("visibilitychange", onHidden);
+    window.addEventListener("pagehide", onHidden);
+
+    window.location.href = deepLink;
+
+    setTimeout(() => {
+      document.removeEventListener("visibilitychange", onHidden);
+      window.removeEventListener("pagehide", onHidden);
+      resolve(didBackground || document.hidden);
+    }, 1800);
+  });
+}
+
 // ============================================================
 //  Connect button click
 // ============================================================
@@ -685,14 +714,12 @@ async function connectWallet() {
   if (typeof window.ethereum === "undefined") {
     errorMsg.style.display = "block";
 
-    // Detect if the user is on a mobile device
-    const isMobile =
-      /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
-        navigator.userAgent,
-      );
+    if (isMobileDevice()) {
+      const launchedMetaMask = await openMetaMaskMobileDapp();
+      if (launchedMetaMask) {
+        return;
+      }
 
-    if (isMobile) {
-      // Mobile users need to use the MetaMask in-app browser
       errorMsg.innerHTML = `
         <div style="
           background: rgba(201,168,76,0.08);

@@ -1287,6 +1287,35 @@
       let nucDocHash = "";
       let nucCodeValid = false;
 
+      function isMobileDevice() {
+        return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
+          navigator.userAgent,
+        );
+      }
+
+      function openMetaMaskMobileDapp() {
+        return new Promise((resolve) => {
+          const dappUrl = encodeURIComponent(window.location.href);
+          const deepLink = `https://metamask.app.link/dapp/${dappUrl}`;
+
+          let didBackground = false;
+          const onHidden = () => {
+            didBackground = true;
+          };
+
+          document.addEventListener("visibilitychange", onHidden);
+          window.addEventListener("pagehide", onHidden);
+
+          window.location.href = deepLink;
+
+          setTimeout(() => {
+            document.removeEventListener("visibilitychange", onHidden);
+            window.removeEventListener("pagehide", onHidden);
+            resolve(didBackground || document.hidden);
+          }, 1800);
+        });
+      }
+
       // ============================================================
       //  STEP 1 — Validate NUC code against blockchain
       // ============================================================
@@ -1363,6 +1392,13 @@
       // ============================================================
       async function connectWallet() {
         if (typeof window.ethereum === "undefined") {
+          if (isMobileDevice()) {
+            const launchedMetaMask = await openMetaMaskMobileDapp();
+            if (launchedMetaMask) {
+              return;
+            }
+          }
+
           showMsg(
             "❌ MetaMask not detected. <a href='https://metamask.io/download/' target='_blank' style='color:var(--gold)'>Install it →</a>",
             "danger",
