@@ -1587,6 +1587,7 @@
       //  STATE
       // ============================================================
       let web3, contract, currentAccount;
+      let lastIssuedVerifyUrl = "";
 
       // Build verify URL from the current deployment to avoid stale preview links.
       const BASE_VERIFY_URL = new URL("verify.html", window.location.href).href;
@@ -1837,6 +1838,7 @@
       // ============================================================
       function generateAndShowQR(certId, name, programme, year) {
         const verifyURL = `${BASE_VERIFY_URL}?id=${certId}`;
+        lastIssuedVerifyUrl = verifyURL;
         const container = document.getElementById("qrcode-container");
         container.innerHTML = "";
 
@@ -1902,43 +1904,112 @@
       // ============================================================
       //  DOWNLOAD QR
       // ============================================================
-      function downloadQR() {
-        const certId = document.getElementById("displayCertId").innerText;
+      function triggerBlobDownload(blob, filename) {
+        const a = document.createElement("a");
+        const objectUrl = URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      }
+
+      async function downloadQR() {
+        const certId =
+          document.getElementById("displayCertId").innerText.trim() ||
+          "certificate";
+        const filename = `${certId}-QR.png`;
 
         // Try canvas first (QRCode.js fallback)
         const canvas = document.querySelector("#qrcode-container canvas");
         if (canvas) {
+          if (canvas.toBlob) {
+            const blob = await new Promise((resolve) =>
+              canvas.toBlob(resolve, "image/png"),
+            );
+            if (blob) {
+              triggerBlobDownload(blob, filename);
+              return;
+            }
+          }
+
           const a = document.createElement("a");
-          a.download = `${certId}-QR.png`;
+          a.download = filename;
           a.href = canvas.toDataURL("image/png");
+          document.body.appendChild(a);
           a.click();
+          a.remove();
           return;
         }
 
-        // Google Charts img
+        // QR image fallback
         const img = document.querySelector("#qrcode-container img");
         if (img) {
-          const a = document.createElement("a");
-          a.download = `${certId}-QR.png`;
-          a.href = img.src;
-          a.target = "_blank";
-          a.click();
-          return;
+          try {
+            const response = await fetch(img.src, { mode: "cors" });
+            if (!response.ok) throw new Error("QR image fetch failed");
+            const blob = await response.blob();
+            triggerBlobDownload(blob, filename);
+            return;
+          } catch (_) {
+            // Some mobile browsers block remote-image file downloads.
+            window.open(img.src, "_blank", "noopener");
+            alert(
+              "QR opened in a new tab. If download does not start automatically, long-press the image and save it.",
+            );
+            return;
+          }
+        }
+
+        // Last fallback: preserve verification access even if image node is missing.
+        if (lastIssuedVerifyUrl) {
+          try {
+            await navigator.clipboard.writeText(lastIssuedVerifyUrl);
+            alert(
+              "QR is not ready yet. Verification URL copied to clipboard as fallback.",
+            );
+            return;
+          } catch (_) {
+            alert(
+              "QR is not ready yet. Please wait a moment and try downloading again.",
+            );
+            return;
+          }
         }
 
         alert("QR code not found. Please issue a certificate first.");
       }
 
-      function copyCertId() {
-        const certId = document.getElementById("displayCertId").innerText;
-        navigator.clipboard.writeText(certId).then(() => {
-          const btn = document.querySelector(".btn-copy-id");
-          const original = btn.innerHTML;
-          btn.innerHTML = "✅ Copied!";
-          setTimeout(() => {
-            btn.innerHTML = original;
-          }, 2000);
-        });
+      async function copyCertId() {
+        const certId = document
+          .getElementById("displayCertId")
+          .innerText.trim();
+        if (!certId) {
+          alert("No certificate ID available yet.");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(certId);
+        } catch (_) {
+          const temp = document.createElement("textarea");
+          temp.value = certId;
+          temp.setAttribute("readonly", "");
+          temp.style.position = "absolute";
+          temp.style.left = "-9999px";
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand("copy");
+          temp.remove();
+        }
+
+        const btn = document.querySelector(".btn-copy-id");
+        const original = btn.innerHTML;
+        btn.innerHTML = "✅ Copied!";
+        setTimeout(() => {
+          btn.innerHTML = original;
+        }, 2000);
       }
 
       // ============================================================
