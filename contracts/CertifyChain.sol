@@ -26,6 +26,7 @@ pragma solidity ^0.8.20;
  *  5. addValidNucCode() / removeValidNucCode() — owner-only functions
  *     to manage the list of NUC-accredited institution codes.
  */
+ 
 contract CertifyChain {
 
     // =========================================================
