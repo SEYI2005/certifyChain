@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -49,7 +49,8 @@
         content: "";
         position: fixed;
         inset: 0;
-        background-image: radial-gradient(
+        background-image:
+          radial-gradient(
             circle at 20% 50%,
             rgba(201, 168, 76, 0.04) 0%,
             transparent 50%
@@ -467,12 +468,510 @@
           </div>
         </div>
       </main>
+      <!-- Wrong Network Modal -->
+      <div
+        id="networkModal"
+        style="
+          display: none;
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: rgba(0, 0, 0, 0.6);
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div
+          style="
+            background: #fff;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 90%;
+            overflow: hidden;
+          "
+        >
+          <!-- Header -->
+          <div
+            style="
+              background: #fff3cd;
+              padding: 1rem 1.25rem;
+              border-bottom: 1px solid #ffc107;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <i
+              class="ti ti-alert-triangle"
+              style="font-size: 20px; color: #856404"
+            ></i>
+            <span style="font-weight: 500; color: #856404"
+              >Wrong network detected</span
+            >
+          </div>
+
+          <!-- Body -->
+          <div style="padding: 1.5rem">
+            <p style="font-weight: 500; margin: 0 0 6px">
+              Your wallet is on the wrong network
+            </p>
+            <p
+              style="
+                font-size: 14px;
+                color: #666;
+                margin: 0 0 1rem;
+                line-height: 1.6;
+              "
+            >
+              CertifyChain only works on the
+              <strong>Ethereum Sepolia Testnet</strong>. Your MetaMask is
+              currently connected to a different network.
+            </p>
+
+            <!-- Friendly tip -->
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 12px;
+                margin-bottom: 1rem;
+                font-size: 13px;
+                color: #555;
+                line-height: 1.6;
+              "
+            >
+              💡 <strong>Not sure what this means?</strong> Think of it like
+              being in the wrong country — your wallet is connected but to a
+              different blockchain. Click below and MetaMask will automatically
+              switch you over.
+            </div>
+
+            <!-- Status rows -->
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-bottom: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span style="font-size: 13px; color: #666"
+                >❌ Current network</span
+              >
+              <span
+                id="currentNetworkName"
+                style="
+                  font-size: 13px;
+                  color: #dc3545;
+                  background: #f8d7da;
+                  padding: 2px 10px;
+                  border-radius: 99px;
+                  font-weight: 500;
+                "
+              >
+                Unknown
+              </span>
+            </div>
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-bottom: 1.25rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span style="font-size: 13px; color: #666"
+                >✅ Required network</span
+              >
+              <span
+                style="
+                  font-size: 13px;
+                  color: #198754;
+                  background: #d1e7dd;
+                  padding: 2px 10px;
+                  border-radius: 99px;
+                  font-weight: 500;
+                "
+                >Sepolia Testnet</span
+              >
+            </div>
+
+            <!-- Switch button -->
+            <button
+              onclick="switchToSepolia()"
+              id="switchBtn"
+              style="
+                width: 100%;
+                padding: 11px;
+                border-radius: 8px;
+                border: none;
+                background: #0d6efd;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              🔄 Switch to Sepolia automatically
+            </button>
+            <p
+              style="
+                font-size: 12px;
+                color: #999;
+                text-align: center;
+                margin: 10px 0 0;
+              "
+            >
+              MetaMask will ask for confirmation. No funds will be moved.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Wrong Network Modal -->
+      <div
+        id="networkModal"
+        style="
+          display: none;
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: rgba(0, 0, 0, 0.6);
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div
+          style="
+            background: #fff;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 90%;
+            overflow: hidden;
+          "
+        >
+          <!-- Header -->
+          <div
+            style="
+              background: #fff3cd;
+              padding: 1rem 1.25rem;
+              border-bottom: 1px solid #ffc107;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <i
+              class="ti ti-alert-triangle"
+              style="font-size: 20px; color: #856404"
+            ></i>
+            <span style="font-weight: 500; color: #856404"
+              >Wrong network detected</span
+            >
+          </div>
+
+          <!-- Body -->
+          <div style="padding: 1.5rem">
+            <p style="font-weight: 500; margin: 0 0 6px">
+              Your wallet is on the wrong network
+            </p>
+            <p
+              style="
+                font-size: 14px;
+                color: #666;
+                margin: 0 0 1rem;
+                line-height: 1.6;
+              "
+            >
+              CertifyChain only works on the
+              <strong>Ethereum Sepolia Testnet</strong>. Your MetaMask is
+              currently connected to a different network.
+            </p>
+
+            <!-- Friendly tip -->
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 12px;
+                margin-bottom: 1rem;
+                font-size: 13px;
+                color: #555;
+                line-height: 1.6;
+              "
+            >
+              💡 <strong>Not sure what this means?</strong> Think of it like
+              being in the wrong country — your wallet is connected but to a
+              different blockchain. Click below and MetaMask will automatically
+              switch you over.
+            </div>
+
+            <!-- Status rows -->
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-bottom: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span style="font-size: 13px; color: #666"
+                >❌ Current network</span
+              >
+              <span
+                id="currentNetworkName"
+                style="
+                  font-size: 13px;
+                  color: #dc3545;
+                  background: #f8d7da;
+                  padding: 2px 10px;
+                  border-radius: 99px;
+                  font-weight: 500;
+                "
+              >
+                Unknown
+              </span>
+            </div>
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-bottom: 1.25rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span style="font-size: 13px; color: #666"
+                >✅ Required network</span
+              >
+              <span
+                style="
+                  font-size: 13px;
+                  color: #198754;
+                  background: #d1e7dd;
+                  padding: 2px 10px;
+                  border-radius: 99px;
+                  font-weight: 500;
+                "
+                >Sepolia Testnet</span
+              >
+            </div>
+
+            <!-- Switch button -->
+            <button
+              onclick="switchToSepolia()"
+              id="switchBtn"
+              style="
+                width: 100%;
+                padding: 11px;
+                border-radius: 8px;
+                border: none;
+                background: #0d6efd;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              🔄 Switch to Sepolia automatically
+            </button>
+            <p
+              style="
+                font-size: 12px;
+                color: #999;
+                text-align: center;
+                margin: 10px 0 0;
+              "
+            >
+              MetaMask will ask for confirmation. No funds will be moved.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Wrong Network Modal -->
+      <div
+        id="networkModal"
+        style="
+          display: none;
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: rgba(0, 0, 0, 0.6);
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div
+          style="
+            background: #fff;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 90%;
+            overflow: hidden;
+          "
+        >
+          <!-- Header -->
+          <div
+            style="
+              background: #fff3cd;
+              padding: 1rem 1.25rem;
+              border-bottom: 1px solid #ffc107;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <i
+              class="ti ti-alert-triangle"
+              style="font-size: 20px; color: #856404"
+            ></i>
+            <span style="font-weight: 500; color: #856404"
+              >Wrong network detected</span
+            >
+          </div>
+
+          <!-- Body -->
+          <div style="padding: 1.5rem">
+            <p style="font-weight: 500; margin: 0 0 6px">
+              Your wallet is on the wrong network
+            </p>
+            <p
+              style="
+                font-size: 14px;
+                color: #666;
+                margin: 0 0 1rem;
+                line-height: 1.6;
+              "
+            >
+              CertifyChain only works on the
+              <strong>Ethereum Sepolia Testnet</strong>. Your MetaMask is
+              currently connected to a different network.
+            </p>
+
+            <!-- Friendly tip -->
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 12px;
+                margin-bottom: 1rem;
+                font-size: 13px;
+                color: #555;
+                line-height: 1.6;
+              "
+            >
+              💡 <strong>Not sure what this means?</strong> Think of it like
+              being in the wrong country — your wallet is connected but to a
+              different blockchain. Click below and MetaMask will automatically
+              switch you over.
+            </div>
+
+            <!-- Status rows -->
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-bottom: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span style="font-size: 13px; color: #666"
+                >❌ Current network</span
+              >
+              <span
+                id="currentNetworkName"
+                style="
+                  font-size: 13px;
+                  color: #dc3545;
+                  background: #f8d7da;
+                  padding: 2px 10px;
+                  border-radius: 99px;
+                  font-weight: 500;
+                "
+              >
+                Unknown
+              </span>
+            </div>
+            <div
+              style="
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-bottom: 1.25rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span style="font-size: 13px; color: #666"
+                >✅ Required network</span
+              >
+              <span
+                style="
+                  font-size: 13px;
+                  color: #198754;
+                  background: #d1e7dd;
+                  padding: 2px 10px;
+                  border-radius: 99px;
+                  font-weight: 500;
+                "
+                >Sepolia Testnet</span
+              >
+            </div>
+
+            <!-- Switch button -->
+            <button
+              onclick="switchToSepolia()"
+              id="switchBtn"
+              style="
+                width: 100%;
+                padding: 11px;
+                border-radius: 8px;
+                border: none;
+                background: #0d6efd;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              🔄 Switch to Sepolia automatically
+            </button>
+            <p
+              style="
+                font-size: 12px;
+                color: #999;
+                text-align: center;
+                margin: 10px 0 0;
+              "
+            >
+              MetaMask will ask for confirmation. No funds will be moved.
+            </p>
+          </div>
+        </div>
+      </div>
 
       <!-- ── Footer ── -->
       <footer>
         <span>© 2026 CertifyChain · Bowen University, Iwo</span>
         <span
-          style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem"
+          style="
+            font-family: &quot;JetBrains Mono&quot;, monospace;
+            font-size: 0.7rem;
+          "
         >
           Powered by Ethereum
         </span>

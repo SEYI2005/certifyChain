@@ -659,13 +659,138 @@ const CONTRACT_ABI = [
     type: "function",
   },
 ];
+
+// ============================================================
+//  NETWORK CONFIG
+// ============================================================
+const SEPOLIA_CHAIN_ID = "0xaa36a7"; // Sepolia = 11155111 decimal
+
+// Human-readable names for common networks
+const NETWORK_NAMES = {
+  "0x1": "Ethereum Mainnet",
+  "0x89": "Polygon",
+  "0x38": "BNB Smart Chain",
+  "0xa": "Optimism",
+  "0xa4b1": "Arbitrum One",
+  "0x13881": "Polygon Mumbai",
+  "0x7a69": "Hardhat Local",
+};
+
 // ============================================================
 //  STATE
 // ============================================================
 let web3;
 let contract;
 let userAccount;
+let isNetworkCheckDone = false;
 
+// ============================================================
+//  NETWORK MODAL FUNCTIONS
+// ============================================================
+
+// ── Show / hide modal ──────────────────────────────────────────
+function showNetworkModal(currentChainId) {
+  const name = NETWORK_NAMES[currentChainId] || "Unknown network";
+  document.getElementById("currentNetworkName").textContent = name;
+  document.getElementById("networkModal").style.display = "flex";
+  document.getElementById("networkModal").style.alignItems = "center";
+  document.getElementById("networkModal").style.justifyContent = "center";
+}
+
+function hideNetworkModal() {
+  document.getElementById("networkModal").style.display = "none";
+}
+
+// ── Check network ──────────────────────────────────────────────
+async function checkNetwork() {
+  if (!window.ethereum) return true; // No MetaMask, skip check
+
+  try {
+    const chainId = await window.ethereum.request({
+      method: "eth_chainId",
+    });
+    if (chainId !== SEPOLIA_CHAIN_ID) {
+      showNetworkModal(chainId);
+      return false; // wrong network
+    }
+    hideNetworkModal();
+    return true; // correct network
+  } catch (err) {
+    console.error("Network check error:", err);
+    return true; // Assume correct if can't check
+  }
+}
+
+// ── Auto-switch to Sepolia ─────────────────────────────────────
+async function switchToSepolia() {
+  const btn = document.getElementById("switchBtn");
+  btn.textContent = "Switching…";
+  btn.disabled = true;
+
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: SEPOLIA_CHAIN_ID }],
+    });
+    // MetaMask switched — modal will close via chainChanged listener
+  } catch (error) {
+    if (error.code === 4902) {
+      // Sepolia not in MetaMask yet — add it automatically
+      try {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: SEPOLIA_CHAIN_ID,
+              chainName: "Sepolia Testnet",
+              rpcUrls: ["https://rpc.sepolia.org"],
+              nativeCurrency: {
+                name: "SepoliaETH",
+                symbol: "ETH",
+                decimals: 18,
+              },
+              blockExplorerUrls: ["https://sepolia.etherscan.io"],
+            },
+          ],
+        });
+      } catch (addErr) {
+        btn.textContent = "❌ Could not add network — try manually in MetaMask";
+        btn.disabled = false;
+      }
+    } else {
+      // User rejected in MetaMask
+      btn.textContent = "🔄 Switch to Sepolia automatically";
+      btn.disabled = false;
+    }
+  }
+}
+
+// ── Listen for network changes in real-time ────────────────────
+if (window.ethereum) {
+  window.ethereum.on("chainChanged", (chainId) => {
+    if (chainId === SEPOLIA_CHAIN_ID) {
+      hideNetworkModal();
+      window.location.reload(); // reload to reinitialise with correct network
+    } else {
+      showNetworkModal(chainId);
+    }
+  });
+
+  // Also listen for account changes
+  window.ethereum.on("accountsChanged", (accounts) => {
+    if (accounts.length === 0) {
+      // User disconnected - reload to reset state
+      window.location.reload();
+    } else {
+      // Account changed - reload to reinitialize
+      window.location.reload();
+    }
+  });
+}
+
+// ============================================================
+//  MOBILE DETECTION
+// ============================================================
 function isMobileDevice() {
   return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
     navigator.userAgent,
@@ -696,7 +821,7 @@ function openMetaMaskMobileDapp() {
 }
 
 // ============================================================
-//  Connect button click
+//  CONNECT BUTTON CLICK
 // ============================================================
 document.getElementById("connectBtn").addEventListener("click", connectWallet);
 
@@ -721,48 +846,56 @@ async function connectWallet() {
       }
 
       errorMsg.innerHTML = `
-        <div style="
-          background: rgba(201,168,76,0.08);
-          border: 1px solid rgba(201,168,76,0.3);
-          border-radius: 12px;
-          padding: 16px;
-          text-align: left;
-          font-size: 0.82rem;
-          line-height: 1.8;
-          color: #f5f7fa;
-        ">
-          <div style="font-weight:700; color:#c9a84c; margin-bottom:10px; font-size:0.88rem;">
-            📱 MetaMask Required
-          </div>
-          To use CertifyChain on mobile, follow these steps:
-          <ol style="margin: 10px 0 0 16px; display:flex; flex-direction:column; gap:6px;">
-            <li>Download the <strong style="color:#c9a84c;">MetaMask app</strong> from the
-              <a href="https://apps.apple.com/app/metamask/id1438144202" target="_blank"
-                style="color:#c9a84c;">App Store</a> or
-              <a href="https://play.google.com/store/apps/details?id=io.metamask" target="_blank"
-                style="color:#c9a84c;">Play Store</a>
-            </li>
-            <li>Open the <strong style="color:#c9a84c;">MetaMask app</strong></li>
-            <li>Tap the <strong style="color:#c9a84c;">browser icon</strong> at the bottom of the app</li>
-            <li>Type in your <strong style="color:#c9a84c;">CertifyChain URL</strong> in the browser bar</li>
-            <li>Tap <strong style="color:#c9a84c;">Connect Wallet</strong> as normal</li>
-          </ol>
-        </div>
-      `;
+              <div style="
+                background: rgba(201,168,76,0.08);
+                border: 1px solid rgba(201,168,76,0.3);
+                border-radius: 12px;
+                padding: 16px;
+                text-align: left;
+                font-size: 0.82rem;
+                line-height: 1.8;
+                color: #f5f7fa;
+              ">
+                <div style="font-weight:700; color:#c9a84c; margin-bottom:10px; font-size:0.88rem;">
+                  📱 MetaMask Required
+                </div>
+                To use CertifyChain on mobile, follow these steps:
+                <ol style="margin: 10px 0 0 16px; display:flex; flex-direction:column; gap:6px;">
+                  <li>Download the <strong style="color:#c9a84c;">MetaMask app</strong> from the
+                    <a href="https://apps.apple.com/app/metamask/id1438144202" target="_blank"
+                      style="color:#c9a84c;">App Store</a> or
+                    <a href="https://play.google.com/store/apps/details?id=io.metamask" target="_blank"
+                      style="color:#c9a84c;">Play Store</a>
+                  </li>
+                  <li>Open the <strong style="color:#c9a84c;">MetaMask app</strong></li>
+                  <li>Tap the <strong style="color:#c9a84c;">browser icon</strong> at the bottom of the app</li>
+                  <li>Type in your <strong style="color:#c9a84c;">CertifyChain URL</strong> in the browser bar</li>
+                  <li>Tap <strong style="color:#c9a84c;">Connect Wallet</strong> as normal</li>
+                </ol>
+              </div>
+            `;
     } else {
-      // Desktop users — standard MetaMask install message
       errorMsg.innerHTML = `
-        ❌ MetaMask not detected.
-        <a href="https://metamask.io/download/" target="_blank" style="color:#c9a84c;">
-          Install MetaMask →
-        </a>
-      `;
+              ❌ MetaMask not detected.
+              <a href="https://metamask.io/download/" target="_blank" style="color:#c9a84c;">
+                Install MetaMask →
+              </a>
+            `;
     }
     return;
   }
 
+  // ── STEP 1: Check network BEFORE connecting ──
+  const isCorrectNetwork = await checkNetwork();
+  if (!isCorrectNetwork) {
+    // Modal is already shown by checkNetwork()
+    errorMsg.style.display = "block";
+    errorMsg.innerText = "⚠️ Please switch to Sepolia network to continue.";
+    return;
+  }
+
   btn.disabled = true;
-  btnIcon.innerHTML = `<span style="width:16px;height:16px;border:2px solid #0a0f1e;border-top-color:transparent;border-radius:50%;display:inline-block;animation:spin 0.7s linear infinite;"></span>`;
+  btnIcon.innerHTML = `<span class="spinner"></span>`;
   btnText.innerText = "Connecting...";
 
   try {
@@ -799,17 +932,6 @@ async function connectWallet() {
 
 // ============================================================
 //  THREE-WAY ROUTING
-//
-//  1. isAdmin = true  + profile.exists = true
-//     → Returning admin → Admin Dashboard
-//
-//  2. isAdmin = true  + profile.exists = false
-//     → Whitelisted but no profile (deployer/system owner edge case)
-//     → Admin Signup so they can complete their profile
-//
-//  3. isAdmin = false
-//     → New or public user → Option Page
-//        (from there: Create Admin Account OR Verify Certificate)
 // ============================================================
 async function checkRoleAndRoute() {
   const loading = document.getElementById("loadingMessage");
@@ -831,8 +953,6 @@ async function checkRoleAndRoute() {
 
     if (profile.exists) {
       // Returning admin with full profile — go straight to dashboard
-      // Save minimal info to localStorage so dashboard loads instantly
-      // while the full on-chain fetch completes in the background
       localStorage.setItem(
         "certifychain_admin",
         JSON.stringify({
@@ -861,10 +981,33 @@ async function checkRoleAndRoute() {
 }
 
 // ============================================================
-//  Auto-reconnect if MetaMask already approved this session
+//  AUTO-RECONNECT if MetaMask already approved this session
 // ============================================================
 window.addEventListener("load", async () => {
   if (typeof window.ethereum === "undefined") return;
+
+  // First, check network and show modal if needed
+  const isCorrectNetwork = await checkNetwork();
+  if (!isCorrectNetwork) {
+    // Modal is shown, but we can still try to detect if wallet is connected
+    // and show the wallet address in the status bar
+    try {
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+      if (accounts.length > 0) {
+        userAccount = accounts[0];
+        const status = document.getElementById("walletStatus");
+        const walletTxt = document.getElementById("walletText");
+        status.classList.add("connected");
+        walletTxt.innerText =
+          userAccount.slice(0, 6) + "..." + userAccount.slice(-4);
+        document.getElementById("btnText").innerText = "Switch Network";
+        document.getElementById("btnIcon").innerText = "⚠️";
+      }
+    } catch (_) {
+      // Silently ignore
+    }
+    return;
+  }
 
   try {
     const accounts = await ethereum.request({ method: "eth_accounts" });
@@ -883,7 +1026,14 @@ window.addEventListener("load", async () => {
 
     document.getElementById("btnText").innerText = "Continue →";
     document.getElementById("btnIcon").innerText = "✅";
+
+    // Auto-route if already connected
+    await checkRoleAndRoute();
   } catch (_) {
     // Silently ignore — user just hasn't connected yet
   }
 });
+
+// ── Make functions globally accessible for onclick ──
+window.switchToSepolia = switchToSepolia;
+window.checkNetwork = checkNetwork;
